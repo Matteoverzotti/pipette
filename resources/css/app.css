@@ -1,0 +1,259 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../js/**/*.tsx';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@layer base {
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+        font: inherit;
+    }
+}
+
+@layer components {
+    .panel {
+        @apply rounded border border-slate-200 bg-white p-5 shadow-sm;
+    }
+
+    .page-band {
+        @apply border-y border-slate-200 bg-white px-4 py-5 sm:px-6;
+    }
+
+    .toolbar {
+        @apply mb-6 flex flex-col gap-3 rounded border border-slate-200 bg-white p-3 shadow-sm md:flex-row;
+    }
+
+    .text-input,
+    .select-input,
+    .text-area {
+        @apply w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-teal-700 focus:ring-2 focus:ring-teal-700/15;
+    }
+
+    .text-area {
+        @apply min-h-28 resize-y;
+    }
+
+    .field-label {
+        @apply mb-1 block text-sm font-medium text-slate-800;
+    }
+
+    .input-with-icon {
+        @apply flex min-h-11 items-center gap-2 rounded border border-slate-300 bg-white px-3 text-slate-600 transition focus-within:border-teal-700 focus-within:ring-2 focus-within:ring-teal-700/15;
+    }
+
+    .input-with-icon input {
+        @apply min-w-0 flex-1 border-0 bg-transparent py-2 text-sm text-slate-950 outline-none;
+    }
+
+    .primary-button,
+    .secondary-button,
+    .ghost-button,
+    .icon-button,
+    .nav-link,
+    .page-button {
+        @apply inline-flex min-h-10 items-center justify-center gap-2 rounded text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
+    }
+
+    .primary-button {
+        @apply bg-teal-700 px-4 text-white hover:bg-teal-800;
+    }
+
+    .secondary-button {
+        @apply border border-amber-500 bg-amber-50 px-4 text-amber-950 hover:bg-amber-100;
+    }
+
+    .ghost-button {
+        @apply border border-slate-200 bg-white px-3 text-slate-800 hover:bg-slate-100;
+    }
+
+    .ghost-button.danger,
+    .icon-button.danger {
+        @apply border-red-200 text-red-700 hover:bg-red-50;
+    }
+
+    .icon-button {
+        @apply h-10 w-10 border border-slate-200 bg-white text-slate-800 hover:bg-slate-100;
+    }
+
+    .icon-button.selected {
+        @apply border-teal-700 bg-teal-50 text-teal-800;
+    }
+
+    .nav-link {
+        @apply px-3 text-slate-700 hover:bg-slate-100;
+    }
+
+    .notice {
+        @apply mb-4 rounded border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-900;
+    }
+
+    .notice.success {
+        @apply border-emerald-200 bg-emerald-50 text-emerald-900;
+    }
+
+    .notice.danger {
+        @apply border-red-200 bg-red-50 text-red-800;
+    }
+
+    .badge {
+        @apply inline-flex items-center gap-1 rounded border border-teal-200 bg-teal-50 px-2 py-1 text-xs font-medium text-teal-800;
+    }
+
+    .badge.neutral {
+        @apply border-slate-200 bg-slate-100 text-slate-700;
+    }
+
+    .badge.danger {
+        @apply border-red-200 bg-red-50 text-red-700;
+    }
+
+    .info-pill {
+        @apply rounded border border-slate-200 bg-white px-3 py-2 text-center shadow-sm;
+    }
+
+    .course-grid {
+        @apply grid gap-4 sm:grid-cols-2 lg:grid-cols-3;
+    }
+
+    .course-card {
+        @apply rounded border border-slate-200 bg-white p-5 shadow-sm transition hover:border-teal-600 hover:shadow-md;
+    }
+
+    .course-card h2 {
+        @apply mt-1 text-lg font-semibold leading-snug text-slate-950;
+    }
+
+    .score-chip {
+        @apply grid h-9 min-w-9 place-items-center rounded bg-amber-100 px-2 text-sm font-semibold text-amber-950;
+    }
+
+    .empty-state {
+        @apply grid place-items-center rounded border border-dashed border-slate-300 bg-white px-6 py-14 text-center text-slate-600;
+    }
+
+    .empty-state h2 {
+        @apply mt-3 text-lg font-semibold text-slate-950;
+    }
+
+    .empty-state.compact {
+        @apply py-10;
+    }
+
+    .page-button {
+        @apply min-w-10 border border-slate-200 bg-white px-3 text-slate-700;
+    }
+
+    .page-button.active {
+        @apply border-teal-700 bg-teal-700 text-white;
+    }
+
+    .feedback-card {
+        @apply rounded border border-slate-200 bg-white p-5 shadow-sm;
+    }
+
+    .feedback-columns {
+        @apply mt-5 grid gap-4 md:grid-cols-2;
+    }
+
+    .feedback-columns > div {
+        @apply rounded border border-slate-200 bg-slate-50 p-4;
+    }
+
+    .feedback-columns h3 {
+        @apply mb-2 text-sm font-semibold text-slate-900;
+    }
+
+    .feedback-columns p {
+        @apply whitespace-pre-line text-sm leading-6 text-slate-700;
+    }
+
+    .vote-box {
+        @apply flex items-center gap-2 rounded border border-slate-200 bg-slate-50 p-1;
+    }
+
+    .admin-grid {
+        @apply grid gap-6 lg:grid-cols-2;
+    }
+
+    .admin-heading {
+        @apply mb-4 text-lg font-semibold;
+    }
+
+    .admin-list {
+        @apply mt-5 divide-y divide-slate-200;
+    }
+
+    .admin-list li {
+        @apply flex items-center justify-between gap-3 py-3 text-sm;
+    }
+
+    .admin-list small {
+        @apply ml-1 text-slate-500;
+    }
+
+    .row-actions,
+    .table-actions,
+    .moderation-actions {
+        @apply flex flex-wrap items-center justify-end gap-2;
+    }
+
+    .catalog-form {
+        @apply grid gap-3 md:grid-cols-2;
+    }
+
+    .professor-picker {
+        @apply grid max-h-48 gap-2 overflow-auto rounded border border-slate-200 bg-slate-50 p-3 text-sm md:col-span-2 md:grid-cols-2;
+    }
+
+    .professor-picker label {
+        @apply flex items-center gap-2;
+    }
+
+    .table-wrap {
+        @apply overflow-x-auto;
+    }
+
+    table {
+        @apply w-full min-w-[720px] border-collapse text-left text-sm;
+    }
+
+    th {
+        @apply border-b border-slate-200 bg-slate-100 px-3 py-2 font-semibold text-slate-700;
+    }
+
+    td {
+        @apply border-b border-slate-200 px-3 py-3 align-top;
+    }
+
+    .moderation-list {
+        @apply grid gap-3;
+    }
+
+    .moderation-item {
+        @apply grid gap-4 rounded border border-slate-200 bg-white p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start;
+    }
+
+    .moderation-item blockquote {
+        @apply mt-3 border-l-4 border-amber-300 pl-3 text-sm text-slate-700;
+    }
+
+    .empty-line {
+        @apply rounded border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-600;
+    }
+}
