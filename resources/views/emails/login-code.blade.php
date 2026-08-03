@@ -1,7 +1,7 @@
-<p>Buna,</p>
+<p>Bună,</p>
 
-<p>Codul tau de acces pentru Feedback Cursuri UniBuc este:</p>
+<p>Codul tău de acces pentru Feedback Cursuri UniBuc este:</p>
 
 <p style="font-size: 28px; font-weight: 700; letter-spacing: 8px;">{{ $code }}</p>
 
-<p>Codul expira in {{ $minutes }} minute. Daca nu ai cerut acest cod, poti ignora acest email.</p>
+<p>Codul expiră în {{ $minutes }} minute. Dacă nu ai cerut acest cod, poți ignora acest email.</p>

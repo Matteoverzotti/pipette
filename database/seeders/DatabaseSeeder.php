@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
 
         $fmi = Faculty::firstOrCreate(
             ['slug' => 'fmi'],
-            ['name' => 'Facultatea de Matematica si Informatica'],
+            ['name' => 'Facultatea de Matematică și Informatică'],
         );
 
         $filosofie = Faculty::firstOrCreate(
@@ -53,7 +53,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Sisteme distribuite',
                 'year' => 3,
                 'semester' => 1,
-                'description' => 'Curs optional despre arhitecturi distribuite, sincronizare si servicii scalabile.',
+                'description' => 'Curs opțional despre arhitecturi distribuite, sincronizare și servicii scalabile.',
             ],
         );
 
@@ -64,7 +64,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Etica aplicata',
                 'year' => 2,
                 'semester' => 2,
-                'description' => 'Discutii si studii de caz despre dileme etice contemporane.',
+                'description' => 'Discuții și studii de caz despre dileme etice contemporane.',
             ],
         );
 
@@ -75,17 +75,17 @@ class DatabaseSeeder extends Seeder
             'course_id' => $distributed->id,
             'user_id' => $student->id,
         ], [
-            'pros' => 'Seminarele sunt practice si ajuta mult la intelegerea conceptelor.',
+            'pros' => 'Seminarele sunt practice și ajută mult la înțelegerea conceptelor.',
             'cons' => 'Proiectul cere lucru constant pe parcursul semestrului.',
-            'tips' => 'Alege tema proiectului devreme si testeaza pe mai multe scenarii.',
+            'tips' => 'Alege tema proiectului devreme și testează pe mai multe scenarii.',
         ]);
 
         $admin->feedback()->firstOrCreate([
             'course_id' => $ethics->id,
         ], [
-            'pros' => 'Discutiile sunt bine ghidate si exemplele sunt actuale.',
+            'pros' => 'Discuțiile sunt bine ghidate și exemplele sunt actuale.',
             'cons' => 'Trebuie citite textele inainte de seminar ca sa tii pasul.',
-            'tips' => 'Noteaza argumentele pro si contra pentru fiecare studiu de caz.',
+            'tips' => 'Notează argumentele pro și contra pentru fiecare studiu de caz.',
         ]);
     }
 }

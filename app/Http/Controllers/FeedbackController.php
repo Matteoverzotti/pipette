@@ -32,7 +32,7 @@ class FeedbackController extends Controller
             ],
         );
 
-        return back()->with('success', 'Feedbackul tau anonim a fost salvat.');
+        return back()->with('success', 'Feedbackul tău anonim a fost salvat.');
     }
 
     public function update(Request $request, Feedback $feedback): RedirectResponse
@@ -56,6 +56,6 @@ class FeedbackController extends Controller
 
         $feedback->delete();
 
-        return back()->with('success', 'Feedbackul a fost sters.');
+        return back()->with('success', 'Feedbackul a fost șters.');
     }
 }

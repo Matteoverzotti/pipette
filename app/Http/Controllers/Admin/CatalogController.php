@@ -37,7 +37,7 @@ class CatalogController extends Controller
             'slug' => Str::slug($validated['name']).'-'.Str::lower(Str::random(6)),
         ]);
 
-        return back()->with('success', 'Facultatea a fost adaugata.');
+        return back()->with('success', 'Facultatea a fost adăugată.');
     }
 
     public function updateFaculty(Request $request, Faculty $faculty): RedirectResponse
@@ -51,14 +51,14 @@ class CatalogController extends Controller
             'slug' => Str::slug($validated['name']).'-'.$faculty->id,
         ]);
 
-        return back()->with('success', 'Facultatea a fost actualizata.');
+        return back()->with('success', 'Facultatea a fost actualizată.');
     }
 
     public function destroyFaculty(Faculty $faculty): RedirectResponse
     {
         $faculty->delete();
 
-        return back()->with('success', 'Facultatea a fost stearsa.');
+        return back()->with('success', 'Facultatea a fost ștearsă.');
     }
 
     public function storeProfessor(Request $request): RedirectResponse
@@ -70,7 +70,7 @@ class CatalogController extends Controller
 
         Professor::create($validated);
 
-        return back()->with('success', 'Profesorul a fost adaugat.');
+        return back()->with('success', 'Profesorul a fost adăugat.');
     }
 
     public function updateProfessor(Request $request, Professor $professor): RedirectResponse
@@ -89,7 +89,7 @@ class CatalogController extends Controller
     {
         $professor->delete();
 
-        return back()->with('success', 'Profesorul a fost sters.');
+        return back()->with('success', 'Profesorul a fost șters.');
     }
 
     public function storeCourse(Request $request): RedirectResponse
@@ -115,7 +115,7 @@ class CatalogController extends Controller
 
         $course->professors()->sync($validated['professor_ids'] ?? []);
 
-        return back()->with('success', 'Cursul a fost adaugat.');
+        return back()->with('success', 'Cursul a fost adăugat.');
     }
 
     public function updateCourse(Request $request, Course $course): RedirectResponse
@@ -148,6 +148,6 @@ class CatalogController extends Controller
     {
         $course->delete();
 
-        return back()->with('success', 'Cursul a fost sters.');
+        return back()->with('success', 'Cursul a fost șters.');
     }
 }

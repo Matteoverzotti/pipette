@@ -35,15 +35,15 @@ export default function Moderation({ reports, feedback }: Props) {
             <Head title="Moderare" />
 
             <section className="panel">
-                <h2 className="admin-heading">Raportari deschise</h2>
+                <h2 className="admin-heading">Raportări deschise</h2>
                 {reports.length === 0 ? (
-                    <p className="empty-line">Nu exista raportari deschise.</p>
+                    <p className="empty-line">Nu există raportări deschise.</p>
                 ) : (
                     <div className="moderation-list">
                         {reports.map((report) => (
                             <article key={report.id} className="moderation-item">
                                 <div>
-                                    <p className="font-semibold">{report.feedback?.course?.name ?? 'Feedback sters'}</p>
+                                    <p className="font-semibold">{report.feedback?.course?.name ?? 'Feedback șters'}</p>
                                     <p className="text-sm text-slate-600">Motiv: {report.reason} · raportat de {report.user?.email}</p>
                                     {report.details && <p className="mt-2 text-sm">{report.details}</p>}
                                     {report.feedback && <blockquote>{report.feedback.pros}</blockquote>}
@@ -63,10 +63,10 @@ export default function Moderation({ reports, feedback }: Props) {
                             <div>
                                 <p className="font-semibold">{item.course?.name}</p>
                                 <p className="text-sm text-slate-600">
-                                    Autor: {item.user?.email} · scor {item.votes_sum_value ?? 0} · raportari {item.reports_count ?? 0}
+                                    Autor: {item.user?.email} · scor {item.votes_sum_value ?? 0} · raportări {item.reports_count ?? 0}
                                 </p>
                                 <p className="mt-2 text-sm">{item.pros}</p>
-                                {(item.hidden_at || item.deleted_at) && <span className="badge danger mt-2">ascuns sau sters</span>}
+                                {(item.hidden_at || item.deleted_at) && <span className="badge danger mt-2">ascuns sau șters</span>}
                             </div>
                             <ModerationActions item={item} />
                         </article>
@@ -87,22 +87,22 @@ function ModerationActions({ item }: { item: FeedbackModeration }) {
             )}
             {(item.hidden_at || item.deleted_at) && (
                 <button className="ghost-button" type="button" onClick={() => restoreFeedback(item)}>
-                    <RotateCcw size={16} /> Restaureaza
+                    <RotateCcw size={16} /> Restaurează
                 </button>
             )}
             {!item.deleted_at && (
                 <button className="ghost-button danger" type="button" onClick={() => deleteFeedback(item)}>
-                    <Trash2 size={16} /> Sterge
+                    <Trash2 size={16} /> Șterge
                 </button>
             )}
             {item.user && !item.user.banned_at && (
                 <button className="ghost-button danger" type="button" onClick={() => banUser(item.user!.id)}>
-                    <Ban size={16} /> Blocheaza
+                    <Ban size={16} /> Blochează
                 </button>
             )}
             {item.user?.banned_at && (
                 <button className="ghost-button" type="button" onClick={() => unbanUser(item.user!.id, item.user!.email)}>
-                    Deblocheaza
+                    Deblochează
                 </button>
             )}
         </div>
@@ -119,7 +119,7 @@ function hideFeedback(id: number) {
 function restoreFeedback(item: FeedbackModeration) {
     const courseName = item.course?.name ?? 'acest curs';
 
-    if (window.confirm(`Restaurezi feedbackul pentru "${courseName}"?\n\nFeedbackul va redeveni vizibil pentru studenti.`)) {
+    if (window.confirm(`Restaurezi feedbackul pentru "${courseName}"?\n\nFeedbackul va redeveni vizibil pentru studenți.`)) {
         router.patch(`/admin/feedback/${item.id}/restore`, {}, { preserveScroll: true });
     }
 }
@@ -127,7 +127,7 @@ function restoreFeedback(item: FeedbackModeration) {
 function deleteFeedback(item: FeedbackModeration) {
     const courseName = item.course?.name ?? 'acest curs';
 
-    if (window.confirm(`Stergi feedbackul pentru "${courseName}"?\n\nRaportarile asociate vor fi inchise si feedbackul nu va mai fi vizibil.`)) {
+    if (window.confirm(`Ștergi feedbackul pentru "${courseName}"?\n\nRaportările asociate vor fi închise și feedbackul nu va mai fi vizibil.`)) {
         router.delete(`/admin/feedback/${item.id}`, { preserveScroll: true });
     }
 }
@@ -140,7 +140,7 @@ function banUser(id: number) {
 }
 
 function unbanUser(id: number, email: string) {
-    if (window.confirm(`Deblochezi utilizatorul ${email}?\n\nUtilizatorul va putea posta, vota si raporta din nou.`)) {
+    if (window.confirm(`Deblochezi utilizatorul ${email}?\n\nUtilizatorul va putea posta, vota și raporta din nou.`)) {
         router.patch(`/admin/users/${id}/unban`, {}, { preserveScroll: true });
     }
 }

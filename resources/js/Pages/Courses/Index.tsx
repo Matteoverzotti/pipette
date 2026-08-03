@@ -21,14 +21,14 @@ export default function CourseIndex({ courses, faculties, filters }: Props) {
 
     function paginationLabel(label: string) {
         return label
-            .replace('pagination.previous', 'Inapoi')
-            .replace('pagination.next', 'Inainte')
-            .replace('&laquo; Previous', 'Inapoi')
-            .replace('Next &raquo;', 'Inainte');
+            .replace('pagination.previous', 'Înapoi')
+            .replace('pagination.next', 'Înainte')
+            .replace('&laquo; Previous', 'Înapoi')
+            .replace('Next &raquo;', 'Înainte');
     }
 
     return (
-        <AppLayout title="Cursuri optionale">
+        <AppLayout title="Cursuri opționale">
             <Head title="Cursuri" />
 
             <section className="toolbar">
@@ -37,15 +37,15 @@ export default function CourseIndex({ courses, faculties, filters }: Props) {
                     <input
                         value={filters.search ?? ''}
                         onChange={(event) => updateFilter('search', event.target.value)}
-                        placeholder="Cauta dupa numele cursului"
+                        placeholder="Caută după numele cursului"
                     />
                 </div>
                 <select className="select-input" value={filters.faculty_id ?? ''} onChange={(event) => updateFilter('faculty_id', event.target.value)}>
-                    <option value="">Toate facultatile</option>
+                    <option value="">Toate facultățile</option>
                     {faculties.map((faculty) => <option key={faculty.id} value={faculty.id}>{faculty.name}</option>)}
                 </select>
                 <select className="select-input" value={filters.year ?? ''} onChange={(event) => updateFilter('year', event.target.value)}>
-                    <option value="">Toti anii</option>
+                    <option value="">Toți anii</option>
                     {[1, 2, 3, 4, 5, 6].map((year) => <option key={year} value={year}>Anul {year}</option>)}
                 </select>
                 <select className="select-input" value={filters.semester ?? ''} onChange={(event) => updateFilter('semester', event.target.value)}>
@@ -58,8 +58,8 @@ export default function CourseIndex({ courses, faculties, filters }: Props) {
             {courses.data.length === 0 ? (
                 <section className="empty-state">
                     <BookOpen size={34} />
-                    <h2>Nu exista cursuri pentru filtrele alese.</h2>
-                    <p>Un administrator poate adauga cursuri din catalog.</p>
+                    <h2>Nu există cursuri pentru filtrele alese.</h2>
+                    <p>Un administrator poate adăuga cursuri din catalog.</p>
                 </section>
             ) : (
                 <section className="course-grid">
@@ -75,7 +75,7 @@ export default function CourseIndex({ courses, faculties, filters }: Props) {
                             <p className="mt-3 text-sm text-slate-600">Anul {course.year}, semestrul {course.semester}</p>
                             <div className="mt-4 flex items-center gap-2 text-sm text-slate-700">
                                 <UsersRound size={16} />
-                                <span>{course.professors?.map((professor) => professor.name).join(', ') || 'Profesori neasignati'}</span>
+                                <span>{course.professors?.map((professor) => professor.name).join(', ') || 'Profesori neasignați'}</span>
                             </div>
                         </Link>
                     ))}

@@ -30,7 +30,7 @@ export default function AppLayout({ title, children }: Props) {
                             </>
                         )}
                         {auth.user && (
-                            <button className="icon-button" type="button" title="Iesire" onClick={() => router.post('/logout')}>
+                            <button className="icon-button" type="button" title="Ieșire" onClick={() => router.post('/logout')}>
                                 <LogOut size={18} />
                             </button>
                         )}

@@ -39,7 +39,7 @@ class LoginCodeController extends Controller
 
         if (! UniBucIdentity::hasAllowedDomain($email)) {
             throw ValidationException::withMessages([
-                'email' => 'Foloseste o adresa institutionala UniBuc.',
+                'email' => 'Folosește o adresă instituțională UniBuc.',
             ]);
         }
 
@@ -47,7 +47,7 @@ class LoginCodeController extends Controller
 
         if (RateLimiter::tooManyAttempts($key, 3)) {
             throw ValidationException::withMessages([
-                'email' => 'Ai cerut prea multe coduri. Incearca din nou mai tarziu.',
+                'email' => 'Ai cerut prea multe coduri. Încearcă din nou mai târziu.',
             ]);
         }
 
@@ -70,7 +70,7 @@ class LoginCodeController extends Controller
         Mail::to($email)->send(new LoginCodeMail($code, $minutes));
 
         return back()->with([
-            'status' => 'Ti-am trimis un cod pe email.',
+            'status' => 'Ți-am trimis un cod pe email.',
             'pendingEmail' => $email,
         ]);
     }
@@ -87,7 +87,7 @@ class LoginCodeController extends Controller
 
         if (RateLimiter::tooManyAttempts($key, 5)) {
             throw ValidationException::withMessages([
-                'code' => 'Prea multe incercari. Cere un cod nou mai tarziu.',
+                'code' => 'Prea multe încercări. Cere un cod nou mai târziu.',
             ]);
         }
 

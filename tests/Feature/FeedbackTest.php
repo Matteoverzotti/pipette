@@ -20,14 +20,14 @@ class FeedbackTest extends TestCase
 
         $this->actingAs($user)->post('/feedback', [
             'course_id' => $course->id,
-            'pros' => 'Profesorii explica foarte clar materia.',
+            'pros' => 'Profesorii explică foarte clar materia.',
             'cons' => 'Temele pot deveni aglomerate spre final.',
             'tips' => 'Incepe proiectul devreme.',
         ]);
 
         $this->actingAs($user)->post('/feedback', [
             'course_id' => $course->id,
-            'pros' => 'Seminarele ajuta mult daca mergi constant.',
+            'pros' => 'Seminarele ajută mult dacă mergi constant.',
             'cons' => 'Este nevoie de lucru saptamanal.',
             'tips' => 'Pastreaza notitele organizate.',
         ]);
@@ -36,7 +36,7 @@ class FeedbackTest extends TestCase
         $this->assertDatabaseHas('feedback', [
             'course_id' => $course->id,
             'user_id' => $user->id,
-            'pros' => 'Seminarele ajuta mult daca mergi constant.',
+            'pros' => 'Seminarele ajută mult dacă mergi constant.',
         ]);
     }
 
@@ -50,7 +50,7 @@ class FeedbackTest extends TestCase
         Feedback::create([
             'course_id' => $course->id,
             'user_id' => $author->id,
-            'pros' => 'Cursul are exemple bune si ritm clar.',
+            'pros' => 'Cursul are exemple bune și ritm clar.',
             'cons' => 'Examenul cere atentie la detalii.',
             'tips' => 'Citeste bibliografia din timp.',
         ]);
@@ -83,7 +83,7 @@ class FeedbackTest extends TestCase
 
     private function course(): Course
     {
-        $faculty = Faculty::create(['name' => 'Matematica si Informatica', 'slug' => 'fmi']);
+        $faculty = Faculty::create(['name' => 'Matematică și Informatică', 'slug' => 'fmi']);
 
         return Course::create([
             'faculty_id' => $faculty->id,

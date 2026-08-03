@@ -17,7 +17,7 @@ class EnsureUserCanContribute
     {
         if ($request->user()?->isBanned()) {
             return back()->withErrors([
-                'account' => 'Contul tau poate citi feedback, dar nu mai poate contribui.',
+                'account' => 'Contul tău poate citi feedback, dar nu mai poate contribui.',
             ]);
         }
 

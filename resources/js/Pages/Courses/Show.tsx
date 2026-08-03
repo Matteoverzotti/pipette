@@ -51,7 +51,7 @@ export default function CourseShow({ course, feedback, ownFeedback }: Props) {
                         <span className="badge neutral" key={professor.id}>
                             <UsersRound size={14} /> {professor.title ? `${professor.title} ` : ''}{professor.name}
                         </span>
-                    )) : <span className="badge neutral">Profesori neasignati</span>}
+                    )) : <span className="badge neutral">Profesori neasignați</span>}
                 </div>
             </section>
 
@@ -60,8 +60,8 @@ export default function CourseShow({ course, feedback, ownFeedback }: Props) {
                     {feedback.length === 0 ? (
                         <div className="empty-state compact">
                             <Pencil size={30} />
-                            <h2>Nu exista feedback public inca.</h2>
-                            <p>Primul raspuns ii poate ajuta pe studentii care aleg optionale.</p>
+                            <h2>Nu există feedback public încă.</h2>
+                            <p>Primul răspuns îi poate ajuta pe studenții care aleg opționale.</p>
                         </div>
                     ) : feedback.map((item) => (
                         <article className="feedback-card" key={item.id}>
@@ -112,11 +112,11 @@ export default function CourseShow({ course, feedback, ownFeedback }: Props) {
 
                             <div className="mt-4 flex flex-wrap gap-2">
                                 <button className="ghost-button" type="button" onClick={() => setReportingId(reportingId === item.id ? null : item.id)} disabled={auth.user?.is_banned}>
-                                    <Flag size={16} /> Raporteaza
+                                    <Flag size={16} /> Raportează
                                 </button>
                                 {item.can_edit && (
                                     <button className="ghost-button danger" type="button" onClick={() => router.delete(`/feedback/${item.id}`, { preserveScroll: true })}>
-                                        <Trash2 size={16} /> Sterge
+                                        <Trash2 size={16} /> Șterge
                                     </button>
                                 )}
                             </div>
@@ -138,11 +138,11 @@ export default function CourseShow({ course, feedback, ownFeedback }: Props) {
                                     <select className="select-input" value={reportReason} onChange={(event) => setReportReason(event.target.value)}>
                                         <option value="abuziv">Abuziv</option>
                                         <option value="spam">Spam</option>
-                                        <option value="date_personale">Contine date personale</option>
+                                        <option value="date_personale">Conține date personale</option>
                                         <option value="irelevant">Irelevant</option>
                                         <option value="altceva">Altceva</option>
                                     </select>
-                                    <textarea className="text-area" value={reportDetails} onChange={(event) => setReportDetails(event.target.value)} placeholder="Detalii optionale" />
+                                    <textarea className="text-area" value={reportDetails} onChange={(event) => setReportDetails(event.target.value)} placeholder="Detalii opționale" />
                                     <button className="secondary-button" type="submit">Trimite raportarea</button>
                                 </form>
                             )}
@@ -151,9 +151,9 @@ export default function CourseShow({ course, feedback, ownFeedback }: Props) {
                 </div>
 
                 <aside className="panel h-fit">
-                    <h2 className="text-lg font-semibold">{ownFeedback ? 'Feedbackul tau' : 'Adauga feedback anonim'}</h2>
+                    <h2 className="text-lg font-semibold">{ownFeedback ? 'Feedbackul tău' : 'Adaugă feedback anonim'}</h2>
                     {auth.user?.is_banned ? (
-                        <p className="mt-3 text-sm text-slate-700">Contul tau poate citi feedback, dar nu poate contribui.</p>
+                        <p className="mt-3 text-sm text-slate-700">Contul tău poate citi feedback, dar nu poate contribui.</p>
                     ) : (
                         <form className="mt-5 space-y-4" onSubmit={submitFeedback}>
                             <div>
@@ -172,7 +172,7 @@ export default function CourseShow({ course, feedback, ownFeedback }: Props) {
                                 <FieldError message={reviewForm.errors.tips} />
                             </div>
                             <button className="primary-button w-full" type="submit" disabled={reviewForm.processing}>
-                                Salveaza anonim
+                                Salvează anonim
                             </button>
                         </form>
                     )}

@@ -34,20 +34,20 @@ export default function Catalog({ faculties, professors, courses }: Props) {
                         facultyForm.post('/admin/faculties', { preserveScroll: true, onSuccess: () => facultyForm.reset() });
                     }}
                 >
-                    <h2 className="admin-heading">Facultati</h2>
+                    <h2 className="admin-heading">Facultăți</h2>
                     <label className="field-label">Nume</label>
                     <input className="text-input" value={facultyForm.data.name} onChange={(event) => facultyForm.setData('name', event.target.value)} />
                     <FieldError message={facultyForm.errors.name} />
-                    <button className="primary-button mt-3" type="submit"><Plus size={17} /> Adauga</button>
+                    <button className="primary-button mt-3" type="submit"><Plus size={17} /> Adaugă</button>
                     <ul className="admin-list">
                         {faculties.map((faculty) => (
                             <li key={faculty.id}>
                                 <span>{faculty.name} <small>{faculty.courses_count ?? 0} cursuri</small></span>
                                 <span className="row-actions">
-                                    <button className="icon-button" title="Redenumeste" type="button" onClick={() => renameFaculty(faculty)}>
+                                    <button className="icon-button" title="Redenumește" type="button" onClick={() => renameFaculty(faculty)}>
                                         <Save size={16} />
                                     </button>
-                                    <button className="icon-button danger" title="Sterge" type="button" onClick={() => deleteFaculty(faculty)}>
+                                    <button className="icon-button danger" title="Șterge" type="button" onClick={() => deleteFaculty(faculty)}>
                                         <Trash2 size={16} />
                                     </button>
                                 </span>
@@ -69,16 +69,16 @@ export default function Catalog({ faculties, professors, courses }: Props) {
                     <FieldError message={professorForm.errors.name} />
                     <label className="field-label mt-3">Titlu</label>
                     <input className="text-input" value={professorForm.data.title} onChange={(event) => professorForm.setData('title', event.target.value)} placeholder="conf. univ. dr." />
-                    <button className="primary-button mt-3" type="submit"><Plus size={17} /> Adauga</button>
+                    <button className="primary-button mt-3" type="submit"><Plus size={17} /> Adaugă</button>
                     <ul className="admin-list">
                         {professors.map((professor) => (
                             <li key={professor.id}>
                                 <span>{professor.title ? `${professor.title} ` : ''}{professor.name} <small>{professor.courses_count ?? 0} cursuri</small></span>
                                 <span className="row-actions">
-                                    <button className="icon-button" title="Editeaza" type="button" onClick={() => editProfessor(professor)}>
+                                    <button className="icon-button" title="Editează" type="button" onClick={() => editProfessor(professor)}>
                                         <Save size={16} />
                                     </button>
-                                    <button className="icon-button danger" title="Sterge" type="button" onClick={() => deleteProfessor(professor)}>
+                                    <button className="icon-button danger" title="Șterge" type="button" onClick={() => deleteProfessor(professor)}>
                                         <Trash2 size={16} />
                                     </button>
                                 </span>
@@ -109,7 +109,7 @@ export default function Catalog({ faculties, professors, courses }: Props) {
                         <option value="1">Semestrul 1</option>
                         <option value="2">Semestrul 2</option>
                     </select>
-                    <textarea className="text-area md:col-span-2" value={courseForm.data.description} onChange={(event) => courseForm.setData('description', event.target.value)} placeholder="Descriere optionala" />
+                    <textarea className="text-area md:col-span-2" value={courseForm.data.description} onChange={(event) => courseForm.setData('description', event.target.value)} placeholder="Descriere opțională" />
                     <div className="professor-picker">
                         {professors.map((professor) => (
                             <label key={professor.id}>
@@ -130,7 +130,7 @@ export default function Catalog({ faculties, professors, courses }: Props) {
                             </label>
                         ))}
                     </div>
-                    <button className="primary-button md:col-span-2" type="submit"><Plus size={17} /> Adauga curs</button>
+                    <button className="primary-button md:col-span-2" type="submit"><Plus size={17} /> Adaugă curs</button>
                 </form>
 
                 <div className="table-wrap mt-6">
@@ -152,8 +152,8 @@ export default function Catalog({ faculties, professors, courses }: Props) {
                                     <td>{course.year}/{course.semester}</td>
                                     <td>{course.professors?.map((professor) => professor.name).join(', ') || '-'}</td>
                                     <td className="table-actions">
-                                        <button className="ghost-button" type="button" onClick={() => editCourse(course, professors)}>Editeaza</button>
-                                        <button className="ghost-button danger" type="button" onClick={() => deleteCourse(course)}>Sterge</button>
+                                        <button className="ghost-button" type="button" onClick={() => editCourse(course, professors)}>Editează</button>
+                                        <button className="ghost-button danger" type="button" onClick={() => deleteCourse(course)}>Șterge</button>
                                     </td>
                                 </tr>
                             ))}
@@ -202,10 +202,10 @@ function editCourse(course: Course, professors: Professor[]) {
 function deleteFaculty(faculty: Faculty) {
     const courseCount = faculty.courses_count ?? 0;
     const warning = courseCount > 0
-        ? `Aceasta va sterge si ${courseCount} cursuri asociate, impreuna cu feedbackul lor.`
-        : 'Aceasta actiune nu poate fi anulata din interfata.';
+        ? `Aceasta va șterge și ${courseCount} cursuri asociate, împreună cu feedbackul lor.`
+        : 'Această acțiune nu poate fi anulată din interfață.';
 
-    if (window.confirm(`Stergi facultatea "${faculty.name}"?\n\n${warning}`)) {
+    if (window.confirm(`Ștergi facultatea "${faculty.name}"?\n\n${warning}`)) {
         router.delete(`/admin/faculties/${faculty.id}`, { preserveScroll: true });
     }
 }
@@ -213,16 +213,16 @@ function deleteFaculty(faculty: Faculty) {
 function deleteProfessor(professor: Professor) {
     const courseCount = professor.courses_count ?? 0;
     const warning = courseCount > 0
-        ? `Profesorul va fi scos din ${courseCount} cursuri. Feedbackul cursurilor ramane pastrat.`
-        : 'Aceasta actiune nu poate fi anulata din interfata.';
+        ? `Profesorul va fi scos din ${courseCount} cursuri. Feedbackul cursurilor rămâne păstrat.`
+        : 'Această acțiune nu poate fi anulată din interfață.';
 
-    if (window.confirm(`Stergi profesorul "${professor.name}"?\n\n${warning}`)) {
+    if (window.confirm(`Ștergi profesorul "${professor.name}"?\n\n${warning}`)) {
         router.delete(`/admin/professors/${professor.id}`, { preserveScroll: true });
     }
 }
 
 function deleteCourse(course: Course) {
-    if (window.confirm(`Stergi cursul "${course.name}"?\n\nSe vor sterge si feedbackurile, voturile si raportarile asociate.`)) {
+    if (window.confirm(`Ștergi cursul "${course.name}"?\n\nSe vor șterge și feedbackurile, voturile și raportările asociate.`)) {
         router.delete(`/admin/courses/${course.id}`, { preserveScroll: true });
     }
 }

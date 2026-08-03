@@ -31,7 +31,7 @@ class AdminTest extends TestCase
             'name' => 'Etica aplicata',
             'year' => 1,
             'semester' => 2,
-            'description' => 'Curs optional.',
+            'description' => 'Curs opțional.',
             'professor_ids' => [$professorId],
         ])->assertSessionHas('success');
 

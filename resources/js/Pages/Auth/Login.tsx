@@ -35,20 +35,20 @@ export default function Login() {
                     <div className="mb-5 grid h-14 w-14 place-items-center rounded bg-teal-700 text-white">
                         <ShieldCheck size={28} />
                     </div>
-                    <h1 className="max-w-2xl text-4xl font-semibold leading-tight">Feedback anonim pentru cursurile optionale UniBuc</h1>
+                    <h1 className="max-w-2xl text-4xl font-semibold leading-tight">Feedback anonim pentru cursurile opționale UniBuc</h1>
                     <p className="mt-4 max-w-xl text-lg text-slate-600">
-                        Intra cu emailul institutional, citeste experiente reale si lasa feedback fara cont sau parola.
+                        Intră cu emailul instituțional, citește experiențe reale și lasă feedback fără cont sau parolă.
                     </p>
                 </section>
 
                 <section className="panel">
                     <h2 className="text-xl font-semibold">Acces</h2>
-                    <p className="mt-1 text-sm text-slate-600">Adrese acceptate: s.unibuc.ro si unibuc.ro.</p>
+                    <p className="mt-1 text-sm text-slate-600">Adrese acceptate: s.unibuc.ro și unibuc.ro.</p>
 
                     {flash.status && step === 'email' && (
                         <div className="notice mt-5 mb-0">
                             {flash.status}
-                            {flash.pendingEmail && <span className="mt-1 block">Verifica inboxul pentru {flash.pendingEmail}.</span>}
+                            {flash.pendingEmail && <span className="mt-1 block">Verifică inboxul pentru {flash.pendingEmail}.</span>}
                         </div>
                     )}
                     {flash.success && <div className="notice success mt-5 mb-0">{flash.success}</div>}
@@ -64,7 +64,7 @@ export default function Login() {
                                 });
                             }}
                         >
-                            <label className="field-label" htmlFor="email">Email institutional</label>
+                            <label className="field-label" htmlFor="email">Email instituțional</label>
                             <div className="input-with-icon">
                                 <Mail size={18} />
                                 <input
@@ -89,7 +89,7 @@ export default function Login() {
                             }}
                         >
                             <div className="rounded border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
-                                Cod trimis catre <strong>{currentEmail}</strong>
+                                Cod trimis către <strong>{currentEmail}</strong>
                             </div>
                             <label className="field-label" htmlFor="code">Cod primit pe email</label>
                             <div className="input-with-icon">
@@ -107,7 +107,7 @@ export default function Login() {
                             <FieldError message={codeForm.errors.code || codeForm.errors.email} />
                             <input type="hidden" name="email" value={currentEmail} readOnly />
                             <button className="secondary-button w-full" type="submit" disabled={codeForm.processing || !currentEmail || codeForm.data.code.length !== 6}>
-                                Verifica si intra
+                                Verifică și intră
                             </button>
                             <button
                                 className="ghost-button w-full"
@@ -117,7 +117,7 @@ export default function Login() {
                                     setStep('email');
                                 }}
                             >
-                                <ArrowLeft size={16} /> Schimba emailul
+                                <ArrowLeft size={16} /> Schimbă emailul
                             </button>
                         </form>
                     )}

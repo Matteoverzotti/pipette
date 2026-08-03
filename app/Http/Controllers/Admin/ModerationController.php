@@ -73,7 +73,7 @@ class ModerationController extends Controller
         $this->log($request, $feedback, 'delete_feedback');
         $this->resolveReports($request, $feedback);
 
-        return back()->with('success', 'Feedbackul a fost sters.');
+        return back()->with('success', 'Feedbackul a fost șters.');
     }
 
     private function resolveReports(Request $request, Feedback $feedback): void

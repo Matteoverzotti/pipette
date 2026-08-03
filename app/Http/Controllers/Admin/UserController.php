@@ -12,7 +12,7 @@ class UserController extends Controller
 {
     public function ban(Request $request, User $user): RedirectResponse
     {
-        abort_if($user->is_admin, 422, 'Administratorii nu pot fi blocati din acest ecran.');
+        abort_if($user->is_admin, 422, 'Administratorii nu pot fi blocați din acest ecran.');
 
         $validated = $request->validate([
             'reason' => ['required', 'string', 'max:1000'],
@@ -31,7 +31,7 @@ class UserController extends Controller
             'reason' => $validated['reason'],
         ]);
 
-        return back()->with('success', 'Utilizatorul a fost blocat de la contributii.');
+        return back()->with('success', 'Utilizatorul a fost blocat de la contribuții.');
     }
 
     public function unban(Request $request, User $user): RedirectResponse
