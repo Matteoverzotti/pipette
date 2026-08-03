@@ -1,5 +1,6 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { Mail, Send, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, KeyRound, Mail, Send, ShieldCheck } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import FieldError from '../../Components/FieldError';
 import type { SharedProps } from '../../types';
 
@@ -7,8 +8,24 @@ export default function Login() {
     const { flash } = usePage<SharedProps>().props;
     const codeForm = useForm({ email: flash.pendingEmail ?? '', code: '' });
     const emailForm = useForm({ email: flash.pendingEmail ?? '' });
+    const [step, setStep] = useState<'email' | 'code'>(flash.pendingEmail ? 'code' : 'email');
 
-    const pendingEmail = flash.pendingEmail || emailForm.data.email || codeForm.data.email;
+    useEffect(() => {
+        if (!flash.pendingEmail) {
+            return;
+        }
+
+        emailForm.setData('email', flash.pendingEmail);
+        codeForm.setData('email', flash.pendingEmail);
+        setStep('code');
+    }, [flash.pendingEmail]);
+
+    const currentEmail = codeForm.data.email || emailForm.data.email || flash.pendingEmail || '';
+
+    function updateEmail(email: string) {
+        emailForm.setData('email', email);
+        codeForm.setData('email', email);
+    }
 
     return (
         <div className="min-h-screen bg-slate-50 px-4 py-10 text-slate-950">
@@ -28,7 +45,7 @@ export default function Login() {
                     <h2 className="text-xl font-semibold">Acces</h2>
                     <p className="mt-1 text-sm text-slate-600">Adrese acceptate: s.unibuc.ro si unibuc.ro.</p>
 
-                    {flash.status && (
+                    {flash.status && step === 'email' && (
                         <div className="notice mt-5 mb-0">
                             {flash.status}
                             {flash.pendingEmail && <span className="mt-1 block">Verifica inboxul pentru {flash.pendingEmail}.</span>}
@@ -36,54 +53,74 @@ export default function Login() {
                     )}
                     {flash.success && <div className="notice success mt-5 mb-0">{flash.success}</div>}
 
-                    <form
-                        className="mt-6 space-y-4"
-                        onSubmit={(event) => {
-                            event.preventDefault();
-                            codeForm.setData('email', emailForm.data.email);
-                            emailForm.post('/login/code', { preserveScroll: true });
-                        }}
-                    >
-                        <label className="field-label" htmlFor="email">Email institutional</label>
-                        <div className="input-with-icon">
-                            <Mail size={18} />
-                            <input
-                                id="email"
-                                type="email"
-                                value={emailForm.data.email}
-                                onChange={(event) => emailForm.setData('email', event.target.value)}
-                                placeholder="prenume.nume@s.unibuc.ro"
-                            />
-                        </div>
-                        <FieldError message={emailForm.errors.email} />
-                        <button className="primary-button w-full" type="submit" disabled={emailForm.processing}>
-                            <Send size={18} /> Trimite cod
-                        </button>
-                    </form>
-
-                    <form
-                        className="mt-6 space-y-4 border-t border-slate-200 pt-6"
-                        onSubmit={(event) => {
-                            event.preventDefault();
-                            codeForm.transform((data) => ({ ...data, email: pendingEmail }));
-                            codeForm.post('/login/verify');
-                        }}
-                    >
-                        <label className="field-label" htmlFor="code">Cod primit pe email</label>
-                        <input
-                            id="code"
-                            className="text-input tracking-[0.35em]"
-                            inputMode="numeric"
-                            maxLength={6}
-                            value={codeForm.data.code}
-                            onChange={(event) => codeForm.setData('code', event.target.value)}
-                            placeholder="000000"
-                        />
-                        <FieldError message={codeForm.errors.code || codeForm.errors.email} />
-                        <button className="secondary-button w-full" type="submit" disabled={codeForm.processing || !pendingEmail}>
-                            Verifica si intra
-                        </button>
-                    </form>
+                    {step === 'email' ? (
+                        <form
+                            className="mt-6 space-y-4"
+                            onSubmit={(event) => {
+                                event.preventDefault();
+                                emailForm.post('/login/code', {
+                                    preserveScroll: true,
+                                    onSuccess: () => setStep('code'),
+                                });
+                            }}
+                        >
+                            <label className="field-label" htmlFor="email">Email institutional</label>
+                            <div className="input-with-icon">
+                                <Mail size={18} />
+                                <input
+                                    id="email"
+                                    type="email"
+                                    value={emailForm.data.email}
+                                    onChange={(event) => updateEmail(event.target.value)}
+                                    placeholder="prenume.nume@s.unibuc.ro"
+                                />
+                            </div>
+                            <FieldError message={emailForm.errors.email} />
+                            <button className="primary-button w-full" type="submit" disabled={emailForm.processing || !emailForm.data.email}>
+                                <Send size={18} /> Trimite cod
+                            </button>
+                        </form>
+                    ) : (
+                        <form
+                            className="mt-6 space-y-4"
+                            onSubmit={(event) => {
+                                event.preventDefault();
+                                codeForm.post('/login/verify');
+                            }}
+                        >
+                            <div className="rounded border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+                                Cod trimis catre <strong>{currentEmail}</strong>
+                            </div>
+                            <label className="field-label" htmlFor="code">Cod primit pe email</label>
+                            <div className="input-with-icon">
+                                <KeyRound size={18} />
+                                <input
+                                    id="code"
+                                    className="tracking-[0.35em]"
+                                    inputMode="numeric"
+                                    maxLength={6}
+                                    value={codeForm.data.code}
+                                    onChange={(event) => codeForm.setData('code', event.target.value)}
+                                    placeholder="000000"
+                                />
+                            </div>
+                            <FieldError message={codeForm.errors.code || codeForm.errors.email} />
+                            <input type="hidden" name="email" value={currentEmail} readOnly />
+                            <button className="secondary-button w-full" type="submit" disabled={codeForm.processing || !currentEmail || codeForm.data.code.length !== 6}>
+                                Verifica si intra
+                            </button>
+                            <button
+                                className="ghost-button w-full"
+                                type="button"
+                                onClick={() => {
+                                    codeForm.reset('code');
+                                    setStep('email');
+                                }}
+                            >
+                                <ArrowLeft size={16} /> Schimba emailul
+                            </button>
+                        </form>
+                    )}
                 </section>
             </main>
         </div>
