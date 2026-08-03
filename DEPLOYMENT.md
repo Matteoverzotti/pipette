@@ -19,6 +19,8 @@ mkdir -p runtime/logs/laravel runtime/logs/apache runtime/logs/worker runtime/st
 
 Copy `.env.production.example` to `.env`, then fill in `APP_URL`, `APP_KEY`, database passwords, SMTP credentials, and `UNIBUC_ADMIN_EMAILS`.
 
+For Resend SMTP on port 587, use `MAIL_SCHEME=smtp`, `MAIL_USERNAME=resend`, `MAIL_PASSWORD` as the Resend API key, and set `MAIL_FROM_ADDRESS` to an address under a domain verified in Resend. Do not use a domain you do not own, such as `noreply@pipette.com`.
+
 For one-off validation against a different env file, set `APP_ENV_FILE`, for example:
 
 ```bash

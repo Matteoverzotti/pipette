@@ -17,6 +17,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class LoginCodeController extends Controller
 {
@@ -60,14 +61,24 @@ class LoginCodeController extends Controller
             'consumed_at' => now(),
         ]);
 
-        LoginCode::create([
+        $loginCode = LoginCode::create([
             'email' => $email,
             'code_hash' => Hash::make($code),
             'expires_at' => now()->addMinutes($minutes),
             'sent_ip' => $request->ip(),
         ]);
 
-        Mail::to($email)->send(new LoginCodeMail($code, $minutes));
+        try {
+            Mail::to($email)->send(new LoginCodeMail($code, $minutes));
+        } catch (Throwable $e) {
+            report($e);
+
+            $loginCode->update(['consumed_at' => now()]);
+
+            throw ValidationException::withMessages([
+                'email' => 'Nu am putut trimite codul acum. Încearcă din nou mai târziu.',
+            ]);
+        }
 
         return back()->with([
             'status' => 'Ți-am trimis un cod pe email.',
