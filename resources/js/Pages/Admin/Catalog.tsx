@@ -47,7 +47,7 @@ export default function Catalog({ faculties, professors, courses }: Props) {
                                     <button className="icon-button" title="Redenumeste" type="button" onClick={() => renameFaculty(faculty)}>
                                         <Save size={16} />
                                     </button>
-                                    <button className="icon-button danger" title="Sterge" type="button" onClick={() => router.delete(`/admin/faculties/${faculty.id}`, { preserveScroll: true })}>
+                                    <button className="icon-button danger" title="Sterge" type="button" onClick={() => deleteFaculty(faculty)}>
                                         <Trash2 size={16} />
                                     </button>
                                 </span>
@@ -78,7 +78,7 @@ export default function Catalog({ faculties, professors, courses }: Props) {
                                     <button className="icon-button" title="Editeaza" type="button" onClick={() => editProfessor(professor)}>
                                         <Save size={16} />
                                     </button>
-                                    <button className="icon-button danger" title="Sterge" type="button" onClick={() => router.delete(`/admin/professors/${professor.id}`, { preserveScroll: true })}>
+                                    <button className="icon-button danger" title="Sterge" type="button" onClick={() => deleteProfessor(professor)}>
                                         <Trash2 size={16} />
                                     </button>
                                 </span>
@@ -153,7 +153,7 @@ export default function Catalog({ faculties, professors, courses }: Props) {
                                     <td>{course.professors?.map((professor) => professor.name).join(', ') || '-'}</td>
                                     <td className="table-actions">
                                         <button className="ghost-button" type="button" onClick={() => editCourse(course, professors)}>Editeaza</button>
-                                        <button className="ghost-button danger" type="button" onClick={() => router.delete(`/admin/courses/${course.id}`, { preserveScroll: true })}>Sterge</button>
+                                        <button className="ghost-button danger" type="button" onClick={() => deleteCourse(course)}>Sterge</button>
                                     </td>
                                 </tr>
                             ))}
@@ -197,4 +197,32 @@ function editCourse(course: Course, professors: Professor[]) {
         description: course.description ?? '',
         professor_ids: professorIds,
     }, { preserveScroll: true });
+}
+
+function deleteFaculty(faculty: Faculty) {
+    const courseCount = faculty.courses_count ?? 0;
+    const warning = courseCount > 0
+        ? `Aceasta va sterge si ${courseCount} cursuri asociate, impreuna cu feedbackul lor.`
+        : 'Aceasta actiune nu poate fi anulata din interfata.';
+
+    if (window.confirm(`Stergi facultatea "${faculty.name}"?\n\n${warning}`)) {
+        router.delete(`/admin/faculties/${faculty.id}`, { preserveScroll: true });
+    }
+}
+
+function deleteProfessor(professor: Professor) {
+    const courseCount = professor.courses_count ?? 0;
+    const warning = courseCount > 0
+        ? `Profesorul va fi scos din ${courseCount} cursuri. Feedbackul cursurilor ramane pastrat.`
+        : 'Aceasta actiune nu poate fi anulata din interfata.';
+
+    if (window.confirm(`Stergi profesorul "${professor.name}"?\n\n${warning}`)) {
+        router.delete(`/admin/professors/${professor.id}`, { preserveScroll: true });
+    }
+}
+
+function deleteCourse(course: Course) {
+    if (window.confirm(`Stergi cursul "${course.name}"?\n\nSe vor sterge si feedbackurile, voturile si raportarile asociate.`)) {
+        router.delete(`/admin/courses/${course.id}`, { preserveScroll: true });
+    }
 }

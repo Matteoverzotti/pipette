@@ -86,12 +86,12 @@ function ModerationActions({ item }: { item: FeedbackModeration }) {
                 </button>
             )}
             {(item.hidden_at || item.deleted_at) && (
-                <button className="ghost-button" type="button" onClick={() => router.patch(`/admin/feedback/${item.id}/restore`, {}, { preserveScroll: true })}>
+                <button className="ghost-button" type="button" onClick={() => restoreFeedback(item)}>
                     <RotateCcw size={16} /> Restaureaza
                 </button>
             )}
             {!item.deleted_at && (
-                <button className="ghost-button danger" type="button" onClick={() => router.delete(`/admin/feedback/${item.id}`, { preserveScroll: true })}>
+                <button className="ghost-button danger" type="button" onClick={() => deleteFeedback(item)}>
                     <Trash2 size={16} /> Sterge
                 </button>
             )}
@@ -101,7 +101,7 @@ function ModerationActions({ item }: { item: FeedbackModeration }) {
                 </button>
             )}
             {item.user?.banned_at && (
-                <button className="ghost-button" type="button" onClick={() => router.patch(`/admin/users/${item.user!.id}/unban`, {}, { preserveScroll: true })}>
+                <button className="ghost-button" type="button" onClick={() => unbanUser(item.user!.id, item.user!.email)}>
                     Deblocheaza
                 </button>
             )}
@@ -116,9 +116,31 @@ function hideFeedback(id: number) {
     }
 }
 
+function restoreFeedback(item: FeedbackModeration) {
+    const courseName = item.course?.name ?? 'acest curs';
+
+    if (window.confirm(`Restaurezi feedbackul pentru "${courseName}"?\n\nFeedbackul va redeveni vizibil pentru studenti.`)) {
+        router.patch(`/admin/feedback/${item.id}/restore`, {}, { preserveScroll: true });
+    }
+}
+
+function deleteFeedback(item: FeedbackModeration) {
+    const courseName = item.course?.name ?? 'acest curs';
+
+    if (window.confirm(`Stergi feedbackul pentru "${courseName}"?\n\nRaportarile asociate vor fi inchise si feedbackul nu va mai fi vizibil.`)) {
+        router.delete(`/admin/feedback/${item.id}`, { preserveScroll: true });
+    }
+}
+
 function banUser(id: number) {
     const reason = window.prompt('Motiv pentru blocare');
     if (reason) {
         router.patch(`/admin/users/${id}/ban`, { reason }, { preserveScroll: true });
+    }
+}
+
+function unbanUser(id: number, email: string) {
+    if (window.confirm(`Deblochezi utilizatorul ${email}?\n\nUtilizatorul va putea posta, vota si raporta din nou.`)) {
+        router.patch(`/admin/users/${id}/unban`, {}, { preserveScroll: true });
     }
 }
