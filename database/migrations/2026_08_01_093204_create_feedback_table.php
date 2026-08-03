@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('course_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->text('pros');
-            $table->text('cons');
+            $table->text('pros')->nullable();
+            $table->text('cons')->nullable();
             $table->text('tips')->nullable();
             $table->timestamp('hidden_at')->nullable();
             $table->foreignId('hidden_by')->nullable()->constrained('users')->nullOnDelete();

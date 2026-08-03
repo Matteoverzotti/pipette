@@ -40,6 +40,45 @@ class FeedbackTest extends TestCase
         ]);
     }
 
+    public function test_feedback_can_use_any_one_text_section(): void
+    {
+        $user = User::factory()->create(['email' => 'student@s.unibuc.ro']);
+        $course = $this->course();
+
+        $this->actingAs($user)->post('/feedback', [
+            'course_id' => $course->id,
+            'pros' => '',
+            'cons' => '',
+            'tips' => 'Mergi la laboratoare și începe proiectul din prima săptămână.',
+        ])->assertSessionHas('success');
+
+        $this->assertDatabaseHas('feedback', [
+            'course_id' => $course->id,
+            'user_id' => $user->id,
+            'pros' => null,
+            'cons' => null,
+            'tips' => 'Mergi la laboratoare și începe proiectul din prima săptămână.',
+        ]);
+    }
+
+    public function test_feedback_requires_at_least_one_text_section(): void
+    {
+        $user = User::factory()->create(['email' => 'student@s.unibuc.ro']);
+        $course = $this->course();
+
+        $this->actingAs($user)->post('/feedback', [
+            'course_id' => $course->id,
+            'pros' => '',
+            'cons' => '',
+            'tips' => '',
+        ])->assertSessionHasErrors('pros');
+
+        $this->assertDatabaseMissing('feedback', [
+            'course_id' => $course->id,
+            'user_id' => $user->id,
+        ]);
+    }
+
     public function test_feedback_is_anonymous_to_students_but_visible_to_admins(): void
     {
         $course = $this->course();

@@ -96,11 +96,11 @@ export default function CourseShow({ course, feedback, ownFeedback }: Props) {
                             <div className="feedback-columns">
                                 <div>
                                     <h3>Plusuri</h3>
-                                    <p>{item.pros}</p>
+                                    <p>{item.pros || 'Nu au fost menționate plusuri.'}</p>
                                 </div>
                                 <div>
                                     <h3>Minusuri</h3>
-                                    <p>{item.cons}</p>
+                                    <p>{item.cons || 'Nu au fost menționate minusuri.'}</p>
                                 </div>
                                 {item.tips && (
                                     <div>

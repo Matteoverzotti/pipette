@@ -44,8 +44,8 @@ export type Course = {
 
 export type FeedbackItem = {
     id: number;
-    pros: string;
-    cons: string;
+    pros?: string | null;
+    cons?: string | null;
     tips?: string | null;
     score: number;
     created_at: string;
