@@ -5,7 +5,7 @@ import { createRoot } from 'react-dom/client';
 import type { ComponentType } from 'react';
 
 createInertiaApp({
-    title: (title) => (`${title} - Feedback Cursuri UniBuc`),
+    title: (title) => (`${title} - ${import.meta.env.VITE_APP_NAME || 'Pipette - Feedback Cursuri UniBuc'}`),
     resolve: async (name) => {
         const pages = import.meta.glob<{ default: ComponentType }>('./Pages/**/*.tsx');
         const page = pages[`./Pages/${name}.tsx`];

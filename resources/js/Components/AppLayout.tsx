@@ -18,7 +18,7 @@ export default function AppLayout({ title, children }: Props) {
                         <span className="grid h-10 w-10 place-items-center rounded bg-teal-700 text-white">
                             <BookOpen size={20} />
                         </span>
-                        <span>Feedback Cursuri UniBuc</span>
+                        <span>Pipette - Feedback Cursuri UniBuc</span>
                     </Link>
 
                     <nav className="flex flex-wrap items-center gap-2 text-sm">
