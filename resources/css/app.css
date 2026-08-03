@@ -167,24 +167,84 @@
         @apply rounded border border-slate-200 bg-white p-5 shadow-sm;
     }
 
-    .feedback-columns {
-        @apply mt-5 grid gap-4 md:grid-cols-2;
+    .feedback-review {
+        @apply mt-5 space-y-4;
     }
 
-    .feedback-columns > div {
-        @apply rounded border border-slate-200 bg-slate-50 p-4;
+    .feedback-row {
+        @apply text-slate-800;
     }
 
-    .feedback-columns h3 {
-        @apply mb-2 text-sm font-semibold text-slate-900;
+    .feedback-row-header {
+        @apply mb-2 flex items-center gap-2;
     }
 
-    .feedback-columns p {
-        @apply whitespace-pre-line text-sm leading-6 text-slate-700;
+    .feedback-row-icon {
+        @apply grid h-6 w-6 place-items-center rounded-full border bg-white;
+    }
+
+    .feedback-row h3 {
+        @apply text-sm font-semibold text-slate-900;
+    }
+
+    .feedback-row p {
+        @apply whitespace-pre-line text-base leading-7 text-slate-800;
+    }
+
+    .feedback-row.positive .feedback-row-icon {
+        @apply border-emerald-300 text-emerald-700;
+    }
+
+    .feedback-row.negative .feedback-row-icon {
+        @apply border-slate-300 text-slate-700;
+    }
+
+    .feedback-row.tip .feedback-row-icon {
+        @apply border-amber-300 text-amber-700;
     }
 
     .vote-box {
         @apply flex items-center gap-2 rounded border border-slate-200 bg-slate-50 p-1;
+    }
+
+    .rules-reminder {
+        @apply mt-5 rounded border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950;
+    }
+
+    .rules-reminder-title {
+        @apply mb-2 flex items-center gap-2 font-semibold;
+    }
+
+    .rules-reminder ul {
+        @apply list-disc space-y-1 pl-5;
+    }
+
+    .rules-reminder a {
+        @apply mt-3 inline-flex font-semibold text-amber-950 underline underline-offset-4;
+    }
+
+    .rules-grid {
+        @apply grid gap-4 md:grid-cols-2;
+    }
+
+    .rules-card {
+        @apply rounded border border-slate-200 bg-white p-5 shadow-sm;
+    }
+
+    .rules-card-title {
+        @apply mb-4 flex items-center gap-3;
+    }
+
+    .rules-card-title span {
+        @apply grid h-9 w-9 place-items-center rounded border border-teal-200 bg-teal-50 text-teal-800;
+    }
+
+    .rules-card h2 {
+        @apply text-lg font-semibold;
+    }
+
+    .rules-card ul {
+        @apply list-disc space-y-2 pl-5 text-sm leading-6 text-slate-700;
     }
 
     .admin-grid {

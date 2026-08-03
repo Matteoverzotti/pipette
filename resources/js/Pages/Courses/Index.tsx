@@ -28,7 +28,7 @@ export default function CourseIndex({ courses, faculties, filters }: Props) {
     }
 
     return (
-        <AppLayout title="Cursuri opționale">
+        <AppLayout title="Cursuri">
             <Head title="Cursuri" />
 
             <section className="toolbar">

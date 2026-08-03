@@ -1,5 +1,5 @@
-import { Head, router, useForm, usePage } from '@inertiajs/react';
-import { Flag, Pencil, ThumbsDown, ThumbsUp, Trash2, UsersRound } from 'lucide-react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Frown, Flag, Lightbulb, Pencil, ShieldCheck, Smile, ThumbsDown, ThumbsUp, Trash2, UsersRound } from 'lucide-react';
 import { useState } from 'react';
 import AppLayout from '../../Components/AppLayout';
 import FieldError from '../../Components/FieldError';
@@ -61,7 +61,7 @@ export default function CourseShow({ course, feedback, ownFeedback }: Props) {
                         <div className="empty-state compact">
                             <Pencil size={30} />
                             <h2>Nu există feedback public încă.</h2>
-                            <p>Primul răspuns îi poate ajuta pe studenții care aleg opționale.</p>
+                            <p>Primul răspuns îi poate ajuta pe studenții care vor lua acest curs.</p>
                         </div>
                     ) : feedback.map((item) => (
                         <article className="feedback-card" key={item.id}>
@@ -93,21 +93,10 @@ export default function CourseShow({ course, feedback, ownFeedback }: Props) {
                                 </div>
                             </div>
 
-                            <div className="feedback-columns">
-                                <div>
-                                    <h3>Plusuri</h3>
-                                    <p>{item.pros || 'Nu au fost menționate plusuri.'}</p>
-                                </div>
-                                <div>
-                                    <h3>Minusuri</h3>
-                                    <p>{item.cons || 'Nu au fost menționate minusuri.'}</p>
-                                </div>
-                                {item.tips && (
-                                    <div>
-                                        <h3>Sfaturi</h3>
-                                        <p>{item.tips}</p>
-                                    </div>
-                                )}
+                            <div className="feedback-review">
+                                {item.pros && <FeedbackRow icon={<Smile size={18} />} title="Pros" tone="positive" text={item.pros} />}
+                                {item.cons && <FeedbackRow icon={<Frown size={18} />} title="Cons" tone="negative" text={item.cons} />}
+                                {item.tips && <FeedbackRow icon={<Lightbulb size={18} />} title="Sfat" tone="tip" text={item.tips} />}
                             </div>
 
                             <div className="mt-4 flex flex-wrap gap-2">
@@ -155,29 +144,56 @@ export default function CourseShow({ course, feedback, ownFeedback }: Props) {
                     {auth.user?.is_banned ? (
                         <p className="mt-3 text-sm text-slate-700">Contul tău poate citi feedback, dar nu poate contribui.</p>
                     ) : (
-                        <form className="mt-5 space-y-4" onSubmit={submitFeedback}>
-                            <div>
-                                <label className="field-label">Plusuri</label>
-                                <textarea className="text-area" value={reviewForm.data.pros} onChange={(event) => reviewForm.setData('pros', event.target.value)} />
-                                <FieldError message={reviewForm.errors.pros} />
-                            </div>
-                            <div>
-                                <label className="field-label">Minusuri</label>
-                                <textarea className="text-area" value={reviewForm.data.cons} onChange={(event) => reviewForm.setData('cons', event.target.value)} />
-                                <FieldError message={reviewForm.errors.cons} />
-                            </div>
-                            <div>
-                                <label className="field-label">Sfaturi</label>
-                                <textarea className="text-area" value={reviewForm.data.tips} onChange={(event) => reviewForm.setData('tips', event.target.value)} />
-                                <FieldError message={reviewForm.errors.tips} />
-                            </div>
-                            <button className="primary-button w-full" type="submit" disabled={reviewForm.processing}>
-                                Salvează anonim
-                            </button>
-                        </form>
+                        <>
+                            <section className="rules-reminder">
+                                <div className="rules-reminder-title">
+                                    <ShieldCheck size={17} />
+                                    <h3>Înainte să scrii</h3>
+                                </div>
+                                <ul>
+                                    <li>Scrie doar despre experiența ta la acest curs.</li>
+                                    <li>Nu publica date personale, insulte sau acuzații neverificabile.</li>
+                                    <li>Feedbackul este anonim pentru studenți, dar poate fi verificat de administratori.</li>
+                                </ul>
+                                <Link href="/rules">Citește regulile complete</Link>
+                            </section>
+
+                            <form className="mt-5 space-y-4" onSubmit={submitFeedback}>
+                                <div>
+                                    <label className="field-label">Plusuri</label>
+                                    <textarea className="text-area" value={reviewForm.data.pros} onChange={(event) => reviewForm.setData('pros', event.target.value)} />
+                                    <FieldError message={reviewForm.errors.pros} />
+                                </div>
+                                <div>
+                                    <label className="field-label">Minusuri</label>
+                                    <textarea className="text-area" value={reviewForm.data.cons} onChange={(event) => reviewForm.setData('cons', event.target.value)} />
+                                    <FieldError message={reviewForm.errors.cons} />
+                                </div>
+                                <div>
+                                    <label className="field-label">Sfaturi</label>
+                                    <textarea className="text-area" value={reviewForm.data.tips} onChange={(event) => reviewForm.setData('tips', event.target.value)} />
+                                    <FieldError message={reviewForm.errors.tips} />
+                                </div>
+                                <button className="primary-button w-full" type="submit" disabled={reviewForm.processing}>
+                                    Salvează anonim
+                                </button>
+                            </form>
+                        </>
                     )}
                 </aside>
             </section>
         </AppLayout>
+    );
+}
+
+function FeedbackRow({ icon, text, title, tone }: { icon: React.ReactNode; text: string; title: string; tone: 'positive' | 'negative' | 'tip' }) {
+    return (
+        <div className={`feedback-row ${tone}`}>
+            <div className="feedback-row-header">
+                <span className="feedback-row-icon">{icon}</span>
+                <h3>{title}</h3>
+            </div>
+            <p>{text}</p>
+        </div>
     );
 }

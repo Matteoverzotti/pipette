@@ -8,6 +8,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\VoteController;
+use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/courses');
@@ -21,6 +22,7 @@ Route::middleware('guest')->group(function (): void {
 Route::post('/logout', [LoginCodeController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::middleware('auth')->group(function (): void {
+    Route::get('/rules', fn () => Inertia::render('Rules'))->name('rules');
     Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
     Route::get('/courses/{course}', [CourseController::class, 'show'])->name('courses.show');
 

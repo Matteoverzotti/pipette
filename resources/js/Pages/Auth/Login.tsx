@@ -35,7 +35,7 @@ export default function Login() {
                     <div className="mb-5 grid h-14 w-14 place-items-center rounded bg-teal-700 text-white">
                         <ShieldCheck size={28} />
                     </div>
-                    <h1 className="max-w-2xl text-4xl font-semibold leading-tight">Feedback anonim pentru cursurile opționale UniBuc</h1>
+                    <h1 className="max-w-2xl text-4xl font-semibold leading-tight">Feedback anonim pentru cursurile UniBuc</h1>
                     <p className="mt-4 max-w-xl text-lg text-slate-600">
                         Intră cu emailul instituțional, citește experiențe reale și lasă feedback fără cont sau parolă.
                     </p>

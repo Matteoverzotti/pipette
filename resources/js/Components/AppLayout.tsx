@@ -22,6 +22,7 @@ export default function AppLayout({ title, children }: Props) {
                     </Link>
 
                     <nav className="flex flex-wrap items-center gap-2 text-sm">
+                        <Link className="nav-link" href="/rules">Reguli</Link>
                         <Link className="nav-link" href="/courses">Cursuri</Link>
                         {auth.user?.is_admin && (
                             <>
