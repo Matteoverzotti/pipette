@@ -19,6 +19,14 @@ export default function CourseIndex({ courses, faculties, filters }: Props) {
         router.get('/courses', { ...filters, [name]: value || undefined }, { preserveState: true, replace: true });
     }
 
+    function paginationLabel(label: string) {
+        return label
+            .replace('pagination.previous', 'Inapoi')
+            .replace('pagination.next', 'Inainte')
+            .replace('&laquo; Previous', 'Inapoi')
+            .replace('Next &raquo;', 'Inainte');
+    }
+
     return (
         <AppLayout title="Cursuri optionale">
             <Head title="Cursuri" />
@@ -82,7 +90,7 @@ export default function CourseIndex({ courses, faculties, filters }: Props) {
                         disabled={!link.url}
                         onClick={() => link.url && router.visit(link.url)}
                         type="button"
-                        dangerouslySetInnerHTML={{ __html: link.label }}
+                        dangerouslySetInnerHTML={{ __html: paginationLabel(link.label) }}
                     />
                 ))}
             </nav>
