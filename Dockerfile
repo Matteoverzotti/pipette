@@ -55,7 +55,8 @@ COPY --from=vendor /app/vendor ./vendor
 COPY --from=assets /app/public/build ./public/build
 COPY docker/entrypoint.sh /usr/local/bin/docker-entrypoint
 
-RUN php artisan package:discover --ansi \
+RUN rm -f bootstrap/cache/packages.php bootstrap/cache/services.php || true \
+    && php artisan package:discover --ansi \
     && chmod +x /usr/local/bin/docker-entrypoint \
     && mkdir -p \
         bootstrap/cache \
