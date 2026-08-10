@@ -2,6 +2,7 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { BookOpen, LogOut, Shield, UserRoundX } from 'lucide-react';
 import type { PropsWithChildren } from 'react';
 import type { SharedProps } from '../types';
+import SiteFooter from './SiteFooter';
 
 type Props = PropsWithChildren<{
     title: string;
@@ -11,7 +12,7 @@ export default function AppLayout({ title, children }: Props) {
     const { auth, flash, errors } = usePage<SharedProps>().props;
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-950">
+        <div className="flex min-h-screen flex-col bg-slate-50 text-slate-950">
             <header className="border-b border-slate-200 bg-white">
                 <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4">
                     <Link href="/courses" className="flex items-center gap-3 font-semibold">
@@ -22,8 +23,12 @@ export default function AppLayout({ title, children }: Props) {
                     </Link>
 
                     <nav className="flex flex-wrap items-center gap-2 text-sm">
-                        <Link className="nav-link" href="/rules">Reguli</Link>
-                        <Link className="nav-link" href="/courses">Cursuri</Link>
+                        {auth.user && (
+                            <>
+                                <Link className="nav-link" href="/rules">Reguli</Link>
+                                <Link className="nav-link" href="/courses">Cursuri</Link>
+                            </>
+                        )}
                         {auth.user?.is_admin && (
                             <>
                                 <Link className="nav-link" href="/admin/catalog">Catalog</Link>
@@ -39,7 +44,7 @@ export default function AppLayout({ title, children }: Props) {
                 </div>
             </header>
 
-            <main className="mx-auto max-w-6xl px-4 py-8">
+            <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
                 <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-semibold">{title}</h1>
@@ -59,6 +64,7 @@ export default function AppLayout({ title, children }: Props) {
 
                 {children}
             </main>
+            <SiteFooter />
         </div>
     );
 }

@@ -2,6 +2,7 @@ import { Head, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, KeyRound, Mail, Send, ShieldCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import FieldError from '../../Components/FieldError';
+import SiteFooter from '../../Components/SiteFooter';
 import type { SharedProps } from '../../types';
 
 export default function Login() {
@@ -28,9 +29,9 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 px-4 py-10 text-slate-950">
+        <div className="flex min-h-screen flex-col bg-slate-50 px-4 pt-10 pb-3 text-slate-950">
             <Head title="Autentificare" />
-            <main className="mx-auto grid max-w-5xl gap-8 md:grid-cols-[1fr_420px] md:items-center">
+            <main className="mx-auto grid w-full max-w-5xl flex-1 gap-8 md:grid-cols-[1fr_420px] md:items-center">
                 <section>
                     <div className="mb-5 grid h-14 w-14 place-items-center rounded bg-teal-700 text-white">
                         <ShieldCheck size={28} />
@@ -123,6 +124,7 @@ export default function Login() {
                     )}
                 </section>
             </main>
+            <SiteFooter compact />
         </div>
     );
 }

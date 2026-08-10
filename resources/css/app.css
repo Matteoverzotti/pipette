@@ -99,6 +99,26 @@
         @apply px-3 text-slate-700 hover:bg-slate-100;
     }
 
+    .inline-link {
+        @apply font-medium text-teal-800 underline underline-offset-4 hover:text-teal-950;
+    }
+
+    .site-footer {
+        @apply mx-auto flex w-full max-w-6xl items-center justify-center gap-x-4 overflow-x-auto border-t border-slate-200 px-4 py-4 text-sm text-slate-600;
+    }
+
+    .site-footer.compact {
+        @apply mt-3 py-2;
+    }
+
+    .site-footer a {
+        @apply inline-flex items-center gap-1 whitespace-nowrap font-medium text-slate-700 hover:text-teal-800;
+    }
+
+    .site-footer span {
+        @apply whitespace-nowrap;
+    }
+
     .notice {
         @apply mb-4 rounded border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-900;
     }
@@ -245,6 +265,27 @@
 
     .rules-card ul {
         @apply list-disc space-y-2 pl-5 text-sm leading-6 text-slate-700;
+    }
+
+    .privacy-document {
+        @apply w-full overflow-hidden border-y border-slate-200 bg-white px-6 py-6 text-slate-800 sm:px-8 lg:px-10;
+    }
+
+    .privacy-document p {
+        @apply w-full text-sm leading-7;
+    }
+
+    .privacy-document h2 {
+        @apply mt-7 w-full text-base font-semibold text-slate-950;
+    }
+
+    .privacy-document ul {
+        @apply mt-3 w-full list-disc space-y-2 pl-5 text-sm leading-7;
+    }
+
+    .privacy-document p + p,
+    .privacy-document ul + p {
+        @apply mt-4;
     }
 
     .admin-grid {

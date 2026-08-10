@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/courses');
 
+Route::get('/privacy', fn () => Inertia::render('Privacy'))->name('privacy');
+
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', [LoginCodeController::class, 'show'])->name('login');
     Route::post('/login/code', [LoginCodeController::class, 'send'])->name('login.code');
