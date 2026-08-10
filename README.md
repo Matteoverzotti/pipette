@@ -1,9 +1,8 @@
 # Pipette
 
 <p align="center">
-    <img src="https://tenor.com/bT0w6.gif" alt="Walter White Cooking GIF">
+    <img src="https://media1.tenor.com/m/l7-ORI8t6IwAAAAd/walter-white-cooking.gif" alt="Walter White Cooking GIF">
 </p>
-
 <p align="center">
 
 <img src="https://img.shields.io/badge/live-pipette.matteoverz.xyz-2ea44f" alt="deployment pipette.matteoverz.xyz">
