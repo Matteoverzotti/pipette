@@ -1,5 +1,5 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { BookOpen, LogOut, Shield, UserRoundX } from 'lucide-react';
+import { LogOut, Shield, UserRoundX } from 'lucide-react';
 import type { PropsWithChildren } from 'react';
 import type { SharedProps } from '../types';
 import SiteFooter from './SiteFooter';
@@ -17,7 +17,7 @@ export default function AppLayout({ title, children }: Props) {
                 <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4">
                     <Link href="/courses" className="flex items-center gap-3 font-semibold">
                         <span className="grid h-10 w-10 place-items-center rounded bg-teal-700 text-white">
-                            <BookOpen size={20} />
+                            <img className="h-10 w-10 rounded" src="/favicon.svg" alt="" aria-hidden="true" />
                         </span>
                         <span>Pipette - Feedback Cursuri UniBuc</span>
                     </Link>
