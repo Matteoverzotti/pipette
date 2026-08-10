@@ -102,6 +102,9 @@ class CatalogController extends Controller
             'description' => ['nullable', 'string', 'max:3000'],
             'professor_ids' => ['array'],
             'professor_ids.*' => ['integer', 'exists:professors,id'],
+            'new_professors' => ['array'],
+            'new_professors.*.name' => ['required', 'string', 'max:255'],
+            'new_professors.*.title' => ['nullable', 'string', 'max:100'],
         ]);
 
         $course = Course::create([
@@ -113,7 +116,7 @@ class CatalogController extends Controller
             'slug' => Str::slug($validated['name']).'-'.Str::lower(Str::random(6)),
         ]);
 
-        $course->professors()->sync($validated['professor_ids'] ?? []);
+        $course->professors()->sync($this->professorIdsForCourse($validated));
 
         return back()->with('success', 'Cursul a fost adăugat.');
     }
@@ -128,6 +131,9 @@ class CatalogController extends Controller
             'description' => ['nullable', 'string', 'max:3000'],
             'professor_ids' => ['array'],
             'professor_ids.*' => ['integer', 'exists:professors,id'],
+            'new_professors' => ['array'],
+            'new_professors.*.name' => ['required', 'string', 'max:255'],
+            'new_professors.*.title' => ['nullable', 'string', 'max:100'],
         ]);
 
         $course->update([
@@ -139,7 +145,7 @@ class CatalogController extends Controller
             'slug' => Str::slug($validated['name']).'-'.$course->id,
         ]);
 
-        $course->professors()->sync($validated['professor_ids'] ?? []);
+        $course->professors()->sync($this->professorIdsForCourse($validated));
 
         return back()->with('success', 'Cursul a fost actualizat.');
     }
@@ -149,5 +155,40 @@ class CatalogController extends Controller
         $course->delete();
 
         return back()->with('success', 'Cursul a fost șters.');
+    }
+
+    /**
+     * @param  array<string, mixed>  $validated
+     * @return array<int, int>
+     */
+    private function professorIdsForCourse(array $validated): array
+    {
+        $professorIds = collect($validated['professor_ids'] ?? []);
+
+        foreach ($validated['new_professors'] ?? [] as $professorData) {
+            $name = trim($professorData['name']);
+            $title = trim($professorData['title'] ?? '');
+
+            if ($name === '') {
+                continue;
+            }
+
+            $professor = Professor::firstOrCreate(
+                ['name' => $name],
+                ['title' => $title !== '' ? $title : null],
+            );
+
+            if ($title !== '' && blank($professor->title)) {
+                $professor->update(['title' => $title]);
+            }
+
+            $professorIds->push($professor->id);
+        }
+
+        return $professorIds
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
     }
 }

@@ -1,5 +1,6 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { Plus, Save, Trash2 } from 'lucide-react';
+import { Check, Pencil, Plus, Save, Search, Trash2, X } from 'lucide-react';
+import { type FormEvent, useMemo, useRef, useState } from 'react';
 import AppLayout from '../../Components/AppLayout';
 import FieldError from '../../Components/FieldError';
 import type { Course, Faculty, Professor } from '../../types';
@@ -10,17 +11,156 @@ type Props = {
     courses: Course[];
 };
 
+type CourseFormData = {
+    faculty_id: string;
+    name: string;
+    year: string;
+    semester: string;
+    description: string;
+    professor_ids: number[];
+    new_professors: NewProfessorDraft[];
+};
+
+type NewProfessorDraft = {
+    client_id: string;
+    name: string;
+    title: string;
+};
+
+type ProfessorEdit = {
+    id: number;
+    name: string;
+    title: string;
+};
+
+const blankCourseForm = (): CourseFormData => ({
+    faculty_id: '',
+    name: '',
+    year: '1',
+    semester: '1',
+    description: '',
+    professor_ids: [],
+    new_professors: [],
+});
+
 export default function Catalog({ faculties, professors, courses }: Props) {
+    const courseFormRef = useRef<HTMLDivElement>(null);
+    const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+    const [assignmentSearch, setAssignmentSearch] = useState('');
+    const [draftProfessorName, setDraftProfessorName] = useState('');
+    const [draftProfessorTitle, setDraftProfessorTitle] = useState('');
+    const [professorEdit, setProfessorEdit] = useState<ProfessorEdit | null>(null);
+
     const facultyForm = useForm({ name: '' });
     const professorForm = useForm({ name: '', title: '' });
-    const courseForm = useForm({
-        faculty_id: '',
-        name: '',
-        year: '1',
-        semester: '1',
-        description: '',
-        professor_ids: [] as number[],
-    });
+    const courseForm = useForm<CourseFormData>(blankCourseForm());
+
+    const selectedProfessors = useMemo(
+        () => courseForm.data.professor_ids
+            .map((id) => professors.find((professor) => professor.id === id))
+            .filter(isProfessor),
+        [courseForm.data.professor_ids, professors],
+    );
+
+    const professorOptions = useMemo(() => {
+        const query = normalizeSearch(assignmentSearch);
+        const selectedIds = new Set(courseForm.data.professor_ids);
+
+        return professors
+            .filter((professor) => !selectedIds.has(professor.id))
+            .filter((professor) => normalizeSearch(`${professor.title ?? ''} ${professor.name}`).includes(query))
+            .slice(0, 24);
+    }, [assignmentSearch, courseForm.data.professor_ids, professors]);
+
+    function resetCourseWorkspace() {
+        setEditingCourse(null);
+        setAssignmentSearch('');
+        setDraftProfessorName('');
+        setDraftProfessorTitle('');
+        courseForm.reset();
+        courseForm.clearErrors();
+    }
+
+    function startCourseEdit(course: Course) {
+        setEditingCourse(course);
+        setAssignmentSearch('');
+        setDraftProfessorName('');
+        setDraftProfessorTitle('');
+        courseForm.clearErrors();
+        courseForm.setData({
+            faculty_id: String(course.faculty_id),
+            name: course.name,
+            year: String(course.year),
+            semester: String(course.semester),
+            description: course.description ?? '',
+            professor_ids: course.professors?.map((professor) => professor.id) ?? [],
+            new_professors: [],
+        });
+        window.requestAnimationFrame(() => courseFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    }
+
+    function submitCourse(event: FormEvent) {
+        event.preventDefault();
+
+        const options = { preserveScroll: true, onSuccess: resetCourseWorkspace };
+
+        if (editingCourse) {
+            courseForm.put(`/admin/courses/${editingCourse.id}`, options);
+        } else {
+            courseForm.post('/admin/courses', options);
+        }
+    }
+
+    function assignProfessor(professorId: number) {
+        if (!courseForm.data.professor_ids.includes(professorId)) {
+            courseForm.setData('professor_ids', [...courseForm.data.professor_ids, professorId]);
+        }
+        setAssignmentSearch('');
+    }
+
+    function removeProfessor(professorId: number) {
+        courseForm.setData('professor_ids', courseForm.data.professor_ids.filter((id) => id !== professorId));
+    }
+
+    function addDraftProfessor() {
+        const name = draftProfessorName.trim();
+        const title = draftProfessorTitle.trim();
+
+        if (!name) {
+            return;
+        }
+
+        const existingProfessor = professors.find((professor) => normalizeSearch(professor.name) === normalizeSearch(name));
+        if (existingProfessor) {
+            assignProfessor(existingProfessor.id);
+        } else if (!courseForm.data.new_professors.some((professor) => normalizeSearch(professor.name) === normalizeSearch(name))) {
+            courseForm.setData('new_professors', [
+                ...courseForm.data.new_professors,
+                { client_id: `${Date.now()}-${name}`, name, title },
+            ]);
+        }
+
+        setDraftProfessorName('');
+        setDraftProfessorTitle('');
+    }
+
+    function removeDraftProfessor(clientId: string) {
+        courseForm.setData('new_professors', courseForm.data.new_professors.filter((professor) => professor.client_id !== clientId));
+    }
+
+    function submitProfessorEdit(event: FormEvent) {
+        event.preventDefault();
+
+        if (!professorEdit) {
+            return;
+        }
+
+        router.put(
+            `/admin/professors/${professorEdit.id}`,
+            { name: professorEdit.name, title: professorEdit.title },
+            { preserveScroll: true, onSuccess: () => setProfessorEdit(null) },
+        );
+    }
 
     return (
         <AppLayout title="Catalog">
@@ -56,81 +196,180 @@ export default function Catalog({ faculties, professors, courses }: Props) {
                     </ul>
                 </form>
 
-                <form
-                    className="panel"
-                    onSubmit={(event) => {
-                        event.preventDefault();
-                        professorForm.post('/admin/professors', { preserveScroll: true, onSuccess: () => professorForm.reset() });
-                    }}
-                >
+                <section className="panel">
                     <h2 className="admin-heading">Profesori</h2>
-                    <label className="field-label">Nume</label>
-                    <input className="text-input" value={professorForm.data.name} onChange={(event) => professorForm.setData('name', event.target.value)} />
-                    <FieldError message={professorForm.errors.name} />
-                    <label className="field-label mt-3">Titlu</label>
-                    <input className="text-input" value={professorForm.data.title} onChange={(event) => professorForm.setData('title', event.target.value)} placeholder="conf. univ. dr." />
-                    <button className="primary-button mt-3" type="submit"><Plus size={17} /> Adaugă</button>
-                    <ul className="admin-list">
+                    <form
+                        className="stacked-form"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            professorForm.post('/admin/professors', { preserveScroll: true, onSuccess: () => professorForm.reset() });
+                        }}
+                    >
+                        <label className="field-label">Nume</label>
+                        <input className="text-input" value={professorForm.data.name} onChange={(event) => professorForm.setData('name', event.target.value)} />
+                        <FieldError message={professorForm.errors.name} />
+                        <label className="field-label">Titlu</label>
+                        <input className="text-input" value={professorForm.data.title} onChange={(event) => professorForm.setData('title', event.target.value)} placeholder="conf. univ. dr." />
+                        <button className="primary-button" type="submit"><Plus size={17} /> Adaugă</button>
+                    </form>
+                    <ul className="admin-list admin-list-scroll">
                         {professors.map((professor) => (
                             <li key={professor.id}>
-                                <span>{professor.title ? `${professor.title} ` : ''}{professor.name} <small>{professor.courses_count ?? 0} cursuri</small></span>
-                                <span className="row-actions">
-                                    <button className="icon-button" title="Editează" type="button" onClick={() => editProfessor(professor)}>
-                                        <Save size={16} />
-                                    </button>
-                                    <button className="icon-button danger" title="Șterge" type="button" onClick={() => deleteProfessor(professor)}>
-                                        <Trash2 size={16} />
-                                    </button>
-                                </span>
+                                {professorEdit?.id === professor.id ? (
+                                    <form className="inline-edit-form" onSubmit={submitProfessorEdit}>
+                                        <input
+                                            className="text-input"
+                                            value={professorEdit.name}
+                                            onChange={(event) => setProfessorEdit({ ...professorEdit, name: event.target.value })}
+                                        />
+                                        <input
+                                            className="text-input"
+                                            value={professorEdit.title}
+                                            onChange={(event) => setProfessorEdit({ ...professorEdit, title: event.target.value })}
+                                            placeholder="Titlu"
+                                        />
+                                        <span className="row-actions">
+                                            <button className="icon-button selected" title="Salvează" type="submit">
+                                                <Check size={16} />
+                                            </button>
+                                            <button className="icon-button" title="Anulează" type="button" onClick={() => setProfessorEdit(null)}>
+                                                <X size={16} />
+                                            </button>
+                                        </span>
+                                    </form>
+                                ) : (
+                                    <>
+                                        <span>{professorLabel(professor)} <small>{professor.courses_count ?? 0} cursuri</small></span>
+                                        <span className="row-actions">
+                                            <button className="icon-button" title="Editează" type="button" onClick={() => setProfessorEdit({ id: professor.id, name: professor.name, title: professor.title ?? '' })}>
+                                                <Pencil size={16} />
+                                            </button>
+                                            <button className="icon-button danger" title="Șterge" type="button" onClick={() => deleteProfessor(professor)}>
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </span>
+                                    </>
+                                )}
                             </li>
                         ))}
                     </ul>
-                </form>
+                </section>
             </section>
 
-            <section className="panel mt-6">
-                <h2 className="admin-heading">Cursuri</h2>
+            <section className="panel mt-6" ref={courseFormRef}>
+                <div className="catalog-header">
+                    <h2 className="admin-heading">Cursuri</h2>
+                    {editingCourse && (
+                        <button className="ghost-button" type="button" onClick={resetCourseWorkspace}>
+                            <X size={16} /> Anulează editarea
+                        </button>
+                    )}
+                </div>
                 <form
-                    className="catalog-form"
-                    onSubmit={(event) => {
-                        event.preventDefault();
-                        courseForm.post('/admin/courses', { preserveScroll: true, onSuccess: () => courseForm.reset() });
-                    }}
+                    className="catalog-form catalog-form-wide"
+                    onSubmit={submitCourse}
                 >
-                    <select className="select-input" value={courseForm.data.faculty_id} onChange={(event) => courseForm.setData('faculty_id', event.target.value)}>
-                        <option value="">Facultate</option>
-                        {faculties.map((faculty) => <option key={faculty.id} value={faculty.id}>{faculty.name}</option>)}
-                    </select>
-                    <input className="text-input" value={courseForm.data.name} onChange={(event) => courseForm.setData('name', event.target.value)} placeholder="Numele cursului" />
-                    <select className="select-input" value={courseForm.data.year} onChange={(event) => courseForm.setData('year', event.target.value)}>
-                        {[1, 2, 3].map((year) => <option key={year} value={year}>Anul {year}</option>)}
-                    </select>
-                    <select className="select-input" value={courseForm.data.semester} onChange={(event) => courseForm.setData('semester', event.target.value)}>
-                        <option value="1">Semestrul 1</option>
-                        <option value="2">Semestrul 2</option>
-                    </select>
-                    <textarea className="text-area md:col-span-2" value={courseForm.data.description} onChange={(event) => courseForm.setData('description', event.target.value)} placeholder="Descriere opțională" />
-                    <div className="professor-picker">
-                        {professors.map((professor) => (
-                            <label key={professor.id}>
-                                <input
-                                    type="checkbox"
-                                    checked={courseForm.data.professor_ids.includes(professor.id)}
-                                    onChange={(event) => {
-                                        const ids = new Set(courseForm.data.professor_ids);
-                                        if (event.target.checked) {
-                                            ids.add(professor.id);
-                                        } else {
-                                            ids.delete(professor.id);
-                                        }
-                                        courseForm.setData('professor_ids', Array.from(ids));
-                                    }}
-                                />
-                                {professor.name}
-                            </label>
-                        ))}
+                    <div className="catalog-fields">
+                        <div>
+                            <label className="field-label">Facultate</label>
+                            <select className="select-input" value={courseForm.data.faculty_id} onChange={(event) => courseForm.setData('faculty_id', event.target.value)}>
+                                <option value="">Alege facultatea</option>
+                                {faculties.map((faculty) => <option key={faculty.id} value={faculty.id}>{faculty.name}</option>)}
+                            </select>
+                            <FieldError message={courseForm.errors.faculty_id} />
+                        </div>
+                        <div>
+                            <label className="field-label">Curs</label>
+                            <input className="text-input" value={courseForm.data.name} onChange={(event) => courseForm.setData('name', event.target.value)} placeholder="Numele cursului" />
+                            <FieldError message={courseForm.errors.name} />
+                        </div>
+                        <div>
+                            <label className="field-label">An</label>
+                            <select className="select-input" value={courseForm.data.year} onChange={(event) => courseForm.setData('year', event.target.value)}>
+                                {[1, 2, 3].map((year) => <option key={year} value={year}>Anul {year}</option>)}
+                            </select>
+                            <FieldError message={courseForm.errors.year} />
+                        </div>
+                        <div>
+                            <label className="field-label">Semestru</label>
+                            <select className="select-input" value={courseForm.data.semester} onChange={(event) => courseForm.setData('semester', event.target.value)}>
+                                <option value="1">Semestrul 1</option>
+                                <option value="2">Semestrul 2</option>
+                            </select>
+                            <FieldError message={courseForm.errors.semester} />
+                        </div>
+                        <div className="md:col-span-2">
+                            <label className="field-label">Descriere</label>
+                            <textarea className="text-area" value={courseForm.data.description} onChange={(event) => courseForm.setData('description', event.target.value)} placeholder="Descriere opțională" />
+                            <FieldError message={courseForm.errors.description} />
+                        </div>
                     </div>
-                    <button className="primary-button md:col-span-2" type="submit"><Plus size={17} /> Adaugă curs</button>
+
+                    <div className="assignment-panel">
+                        <div className="assignment-header">
+                            <div>
+                                <h3>Profesori</h3>
+                                <small>{selectedProfessors.length + courseForm.data.new_professors.length} asignați</small>
+                            </div>
+                        </div>
+
+                        <div className="selected-professors">
+                            {selectedProfessors.map((professor) => (
+                                <button className="professor-chip" key={professor.id} type="button" onClick={() => removeProfessor(professor.id)}>
+                                    {professorLabel(professor)}
+                                    <X size={14} />
+                                </button>
+                            ))}
+                            {courseForm.data.new_professors.map((professor) => (
+                                <button className="professor-chip pending" key={professor.client_id} type="button" onClick={() => removeDraftProfessor(professor.client_id)}>
+                                    {professor.title ? `${professor.title} ` : ''}{professor.name}
+                                    <X size={14} />
+                                </button>
+                            ))}
+                            {selectedProfessors.length === 0 && courseForm.data.new_professors.length === 0 && (
+                                <span className="empty-chip">Niciun profesor asignat</span>
+                            )}
+                        </div>
+
+                        <label className="field-label">Caută profesor existent</label>
+                        <div className="input-with-icon">
+                            <Search size={17} />
+                            <input value={assignmentSearch} onChange={(event) => setAssignmentSearch(event.target.value)} placeholder="Nume sau titlu" />
+                        </div>
+                        <div className="professor-results">
+                            {professorOptions.map((professor) => (
+                                <button key={professor.id} type="button" onClick={() => assignProfessor(professor.id)}>
+                                    <span>{professorLabel(professor)}</span>
+                                    <Plus size={15} />
+                                </button>
+                            ))}
+                            {professorOptions.length === 0 && <span>Nu există rezultate</span>}
+                        </div>
+
+                        <div className="quick-professor">
+                            <label className="field-label">Profesor nou</label>
+                            <div className="quick-professor-fields">
+                                <input className="text-input" value={draftProfessorName} onChange={(event) => setDraftProfessorName(event.target.value)} placeholder="Nume profesor" />
+                                <input className="text-input" value={draftProfessorTitle} onChange={(event) => setDraftProfessorTitle(event.target.value)} placeholder="Titlu" />
+                                <button className="ghost-button" type="button" onClick={addDraftProfessor}>
+                                    <Plus size={16} /> Adaugă
+                                </button>
+                            </div>
+                            <FieldError message={(courseForm.errors as Record<string, string>).new_professors} />
+                        </div>
+                    </div>
+
+                    <div className="form-actions">
+                        <button className="primary-button" type="submit" disabled={courseForm.processing}>
+                            {editingCourse ? <Save size={17} /> : <Plus size={17} />}
+                            {editingCourse ? 'Salvează cursul' : 'Adaugă curs'}
+                        </button>
+                        {editingCourse && (
+                            <button className="ghost-button" type="button" onClick={resetCourseWorkspace}>
+                                <X size={16} /> Anulează
+                            </button>
+                        )}
+                    </div>
                 </form>
 
                 <div className="table-wrap mt-6">
@@ -150,9 +389,11 @@ export default function Catalog({ faculties, professors, courses }: Props) {
                                     <td>{course.name}</td>
                                     <td>{course.faculty?.name}</td>
                                     <td>{course.year}/{course.semester}</td>
-                                    <td>{course.professors?.map((professor) => professor.name).join(', ') || '-'}</td>
+                                    <td>{course.professors?.map(professorLabel).join(', ') || '-'}</td>
                                     <td className="table-actions">
-                                        <button className="ghost-button" type="button" onClick={() => editCourse(course, professors)}>Editează</button>
+                                        <button className="ghost-button" type="button" onClick={() => startCourseEdit(course)}>
+                                            <Pencil size={16} /> Editează
+                                        </button>
                                         <button className="ghost-button danger" type="button" onClick={() => deleteCourse(course)}>Șterge</button>
                                     </td>
                                 </tr>
@@ -165,38 +406,23 @@ export default function Catalog({ faculties, professors, courses }: Props) {
     );
 }
 
+function isProfessor(professor: Professor | undefined): professor is Professor {
+    return professor !== undefined;
+}
+
+function normalizeSearch(value: string) {
+    return value.trim().toLocaleLowerCase('ro-RO');
+}
+
+function professorLabel(professor: Professor) {
+    return professor.title ? `${professor.title} ${professor.name}` : professor.name;
+}
+
 function renameFaculty(faculty: Faculty) {
     const name = window.prompt('Nume facultate', faculty.name);
     if (name) {
         router.put(`/admin/faculties/${faculty.id}`, { name }, { preserveScroll: true });
     }
-}
-
-function editProfessor(professor: Professor) {
-    const name = window.prompt('Nume profesor', professor.name);
-    if (!name) {
-        return;
-    }
-    const title = window.prompt('Titlu', professor.title ?? '') ?? '';
-    router.put(`/admin/professors/${professor.id}`, { name, title }, { preserveScroll: true });
-}
-
-function editCourse(course: Course, professors: Professor[]) {
-    const name = window.prompt('Nume curs', course.name);
-    if (!name) {
-        return;
-    }
-    const professorIds = professors
-        .filter((professor) => window.confirm(`Este ${professor.name} asignat la ${name}?`))
-        .map((professor) => professor.id);
-    router.put(`/admin/courses/${course.id}`, {
-        faculty_id: course.faculty_id,
-        name,
-        year: course.year,
-        semester: course.semester,
-        description: course.description ?? '',
-        professor_ids: professorIds,
-    }, { preserveScroll: true });
 }
 
 function deleteFaculty(faculty: Faculty) {

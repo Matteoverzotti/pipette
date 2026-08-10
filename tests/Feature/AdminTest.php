@@ -37,6 +37,27 @@ class AdminTest extends TestCase
 
         $this->assertDatabaseHas('courses', ['name' => 'Etica aplicata']);
         $this->assertDatabaseHas('course_professor', ['professor_id' => $professorId]);
+
+        $course = Course::where('name', 'Etica aplicata')->firstOrFail();
+
+        $this->actingAs($admin)->put("/admin/courses/{$course->id}", [
+            'faculty_id' => $faculty->id,
+            'name' => 'Etica aplicata si integritate',
+            'year' => 2,
+            'semester' => 1,
+            'description' => 'Curs actualizat.',
+            'professor_ids' => [],
+            'new_professors' => [
+                ['name' => 'Dr. Nou', 'title' => 'prof. univ.'],
+            ],
+        ])->assertSessionHas('success');
+
+        $newProfessorId = Professor::where('name', 'Dr. Nou')->value('id');
+
+        $this->assertDatabaseHas('courses', ['id' => $course->id, 'name' => 'Etica aplicata si integritate']);
+        $this->assertDatabaseHas('professors', ['name' => 'Dr. Nou', 'title' => 'prof. univ.']);
+        $this->assertDatabaseHas('course_professor', ['course_id' => $course->id, 'professor_id' => $newProfessorId]);
+        $this->assertDatabaseMissing('course_professor', ['course_id' => $course->id, 'professor_id' => $professorId]);
     }
 
     public function test_admin_can_moderate_feedback_and_ban_users(): void
