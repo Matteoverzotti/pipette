@@ -1,30 +1,53 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { BookOpen, Search, UsersRound } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import AppLayout from '../../Components/AppLayout';
-import type { Course, Faculty, Paginated } from '../../types';
+import type { Course, Faculty } from '../../types';
 
 type Props = {
-    courses: Paginated<Course>;
+    courses: Course[];
     faculties: Faculty[];
     filters: {
-        search?: string;
         faculty_id?: number | string;
         year?: number | string;
         semester?: number | string;
     };
 };
 
+const coursesPerPage = 12;
+
 export default function CourseIndex({ courses, faculties, filters }: Props) {
+    const [search, setSearch] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const filteredCourses = useMemo(() => {
+        const query = normalizeSearch(search);
+
+        if (!query) {
+            return courses;
+        }
+
+        return courses.filter((course) => normalizeSearch(course.name).includes(query));
+    }, [courses, search]);
+
+    const pageCount = Math.max(1, Math.ceil(filteredCourses.length / coursesPerPage));
+    const safeCurrentPage = Math.min(currentPage, pageCount);
+    const visibleCourses = filteredCourses.slice((safeCurrentPage - 1) * coursesPerPage, safeCurrentPage * coursesPerPage);
+
+    useEffect(() => {
+        if (currentPage > pageCount) {
+            setCurrentPage(pageCount);
+        }
+    }, [currentPage, pageCount]);
+
     function updateFilter(name: string, value: string) {
+        setCurrentPage(1);
         router.get('/courses', { ...filters, [name]: value || undefined }, { preserveState: true, replace: true });
     }
 
-    function paginationLabel(label: string) {
-        return label
-            .replace('pagination.previous', 'Înapoi')
-            .replace('pagination.next', 'Înainte')
-            .replace('&laquo; Previous', 'Înapoi')
-            .replace('Next &raquo;', 'Înainte');
+    function updateSearch(value: string) {
+        setSearch(value);
+        setCurrentPage(1);
     }
 
     return (
@@ -35,8 +58,8 @@ export default function CourseIndex({ courses, faculties, filters }: Props) {
                 <div className="input-with-icon grow">
                     <Search size={18} />
                     <input
-                        value={filters.search ?? ''}
-                        onChange={(event) => updateFilter('search', event.target.value)}
+                        value={search}
+                        onChange={(event) => updateSearch(event.target.value)}
                         placeholder="Caută după numele cursului"
                     />
                 </div>
@@ -55,7 +78,7 @@ export default function CourseIndex({ courses, faculties, filters }: Props) {
                 </select>
             </section>
 
-            {courses.data.length === 0 ? (
+            {visibleCourses.length === 0 ? (
                 <section className="empty-state">
                     <BookOpen size={34} />
                     <h2>Nu există cursuri pentru filtrele alese.</h2>
@@ -63,7 +86,7 @@ export default function CourseIndex({ courses, faculties, filters }: Props) {
                 </section>
             ) : (
                 <section className="course-grid">
-                    {courses.data.map((course) => (
+                    {visibleCourses.map((course) => (
                         <Link key={course.id} href={`/courses/${course.id}`} className="course-card">
                             <div className="flex items-start justify-between gap-3">
                                 <div>
@@ -83,17 +106,41 @@ export default function CourseIndex({ courses, faculties, filters }: Props) {
             )}
 
             <nav className="mt-8 flex flex-wrap gap-2">
-                {courses.links.map((link, index) => (
-                    <button
-                        key={`${link.label}-${index}`}
-                        className={link.active ? 'page-button active' : 'page-button'}
-                        disabled={!link.url}
-                        onClick={() => link.url && router.visit(link.url)}
-                        type="button"
-                        dangerouslySetInnerHTML={{ __html: paginationLabel(link.label) }}
-                    />
-                ))}
+                <button
+                    className="page-button"
+                    disabled={safeCurrentPage === 1}
+                    onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                    type="button"
+                >
+                    Înapoi
+                </button>
+                {Array.from({ length: pageCount }, (_, index) => {
+                    const page = index + 1;
+
+                    return (
+                        <button
+                            key={page}
+                            className={safeCurrentPage === page ? 'page-button active' : 'page-button'}
+                            onClick={() => setCurrentPage(page)}
+                            type="button"
+                        >
+                            {page}
+                        </button>
+                    );
+                })}
+                <button
+                    className="page-button"
+                    disabled={safeCurrentPage === pageCount}
+                    onClick={() => setCurrentPage((page) => Math.min(pageCount, page + 1))}
+                    type="button"
+                >
+                    Înainte
+                </button>
             </nav>
         </AppLayout>
     );
+}
+
+function normalizeSearch(value: string) {
+    return value.trim().toLocaleLowerCase('ro-RO');
 }

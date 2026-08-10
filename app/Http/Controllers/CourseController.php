@@ -13,7 +13,6 @@ class CourseController extends Controller
     public function index(Request $request): Response
     {
         $filters = $request->validate([
-            'search' => ['nullable', 'string', 'max:100'],
             'faculty_id' => ['nullable', 'integer', 'exists:faculties,id'],
             'year' => ['nullable', 'integer', 'between:1,3'],
             'semester' => ['nullable', 'integer', 'between:1,2'],
@@ -22,13 +21,11 @@ class CourseController extends Controller
         $courses = Course::query()
             ->with(['faculty:id,name', 'professors:id,name,title'])
             ->withCount(['visibleFeedback as feedback_count'])
-            ->when($filters['search'] ?? null, fn ($query, $search) => $query->where('name', 'like', "%{$search}%"))
             ->when($filters['faculty_id'] ?? null, fn ($query, $facultyId) => $query->where('faculty_id', $facultyId))
             ->when($filters['year'] ?? null, fn ($query, $year) => $query->where('year', $year))
             ->when($filters['semester'] ?? null, fn ($query, $semester) => $query->where('semester', $semester))
             ->orderBy('name')
-            ->paginate(12)
-            ->withQueryString();
+            ->get();
 
         return Inertia::render('Courses/Index', [
             'courses' => $courses,
