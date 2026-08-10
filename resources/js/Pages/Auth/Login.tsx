@@ -44,7 +44,7 @@ export default function Login() {
 
                 <section className="panel">
                     <h2 className="text-xl font-semibold">Acces</h2>
-                    <p className="mt-1 text-sm text-slate-600">Adrese acceptate: s.unibuc.ro și unibuc.ro.</p>
+                    <p className="mt-1 text-sm text-slate-600">Adrese acceptate: s.unibuc.ro.</p>
 
                     {flash.status && step === 'email' && (
                         <div className="notice mt-5 mb-0">

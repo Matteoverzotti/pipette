@@ -6,7 +6,7 @@ $adminEmails = array_filter(array_map(
 ));
 
 return [
-    'allowed_domains' => ['s.unibuc.ro', 'unibuc.ro'],
+    'allowed_domains' => ['s.unibuc.ro'],
     'admin_emails' => $adminEmails,
     'login_code_minutes' => (int) env('UNIBUC_LOGIN_CODE_MINUTES', 10),
 ];

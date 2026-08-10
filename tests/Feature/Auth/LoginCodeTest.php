@@ -51,21 +51,21 @@ class LoginCodeTest extends TestCase
     public function test_it_rejects_expired_or_wrong_codes(): void
     {
         LoginCode::create([
-            'email' => 'student@unibuc.ro',
+            'email' => 'student@s.unibuc.ro',
             'code_hash' => Hash::make('123456'),
             'expires_at' => now()->subMinute(),
         ]);
 
-        $this->post('/login/verify', ['email' => 'student@unibuc.ro', 'code' => '123456'])
+        $this->post('/login/verify', ['email' => 'student@s.unibuc.ro', 'code' => '123456'])
             ->assertSessionHasErrors('code');
 
         LoginCode::create([
-            'email' => 'student@unibuc.ro',
+            'email' => 'student@s.unibuc.ro',
             'code_hash' => Hash::make('654321'),
             'expires_at' => now()->addMinutes(10),
         ]);
 
-        $this->post('/login/verify', ['email' => 'student@unibuc.ro', 'code' => '000000'])
+        $this->post('/login/verify', ['email' => 'student@s.unibuc.ro', 'code' => '000000'])
             ->assertSessionHasErrors('code');
     }
 
@@ -85,7 +85,7 @@ class LoginCodeTest extends TestCase
     {
         Mail::fake();
 
-        $this->post('/login/code', ['email' => 'admin@unibuc.ro']);
+        $this->post('/login/code', ['email' => 'admin@s.unibuc.ro']);
 
         $code = null;
         Mail::assertSent(LoginCodeMail::class, function (LoginCodeMail $mail) use (&$code) {
@@ -94,8 +94,8 @@ class LoginCodeTest extends TestCase
             return true;
         });
 
-        $this->post('/login/verify', ['email' => 'admin@unibuc.ro', 'code' => $code]);
+        $this->post('/login/verify', ['email' => 'admin@s.unibuc.ro', 'code' => $code]);
 
-        $this->assertTrue(User::where('email', 'admin@unibuc.ro')->firstOrFail()->is_admin);
+        $this->assertTrue(User::where('email', 'admin@s.unibuc.ro')->firstOrFail()->is_admin);
     }
 }

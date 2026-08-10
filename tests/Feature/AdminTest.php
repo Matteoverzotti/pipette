@@ -16,7 +16,7 @@ class AdminTest extends TestCase
 
     public function test_admin_can_manage_catalog(): void
     {
-        $admin = User::factory()->create(['email' => 'admin@unibuc.ro', 'is_admin' => true]);
+        $admin = User::factory()->create(['email' => 'admin@s.unibuc.ro', 'is_admin' => true]);
 
         $this->actingAs($admin)->post('/admin/faculties', ['name' => 'Filosofie'])
             ->assertSessionHas('success');
@@ -69,7 +69,7 @@ class AdminTest extends TestCase
 
     private function moderationFixture(): array
     {
-        $admin = User::factory()->create(['email' => 'admin@unibuc.ro', 'is_admin' => true]);
+        $admin = User::factory()->create(['email' => 'admin@s.unibuc.ro', 'is_admin' => true]);
         $author = User::factory()->create(['email' => 'student@s.unibuc.ro']);
         $faculty = Faculty::create(['name' => 'Istorie', 'slug' => 'istorie']);
         $course = Course::create([

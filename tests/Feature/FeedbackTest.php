@@ -84,7 +84,7 @@ class FeedbackTest extends TestCase
         $course = $this->course();
         $author = User::factory()->create(['email' => 'author@s.unibuc.ro']);
         $student = User::factory()->create(['email' => 'reader@s.unibuc.ro']);
-        $admin = User::factory()->create(['email' => 'admin@unibuc.ro', 'is_admin' => true]);
+        $admin = User::factory()->create(['email' => 'admin@s.unibuc.ro', 'is_admin' => true]);
 
         Feedback::create([
             'course_id' => $course->id,

@@ -48,7 +48,7 @@ class VotingReportingTest extends TestCase
     {
         [$feedback] = $this->feedbackFixture();
         $banned = User::factory()->create([
-            'email' => 'blocked@unibuc.ro',
+            'email' => 'blocked@s.unibuc.ro',
             'banned_at' => now(),
         ]);
 
