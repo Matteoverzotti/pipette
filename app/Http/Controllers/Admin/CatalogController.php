@@ -97,7 +97,7 @@ class CatalogController extends Controller
         $validated = $request->validate([
             'faculty_id' => ['required', 'integer', 'exists:faculties,id'],
             'name' => ['required', 'string', 'max:255'],
-            'year' => ['required', 'integer', 'between:1,6'],
+            'year' => ['required', 'integer', 'between:1,3'],
             'semester' => ['required', 'integer', 'between:1,2'],
             'description' => ['nullable', 'string', 'max:3000'],
             'professor_ids' => ['array'],
@@ -123,7 +123,7 @@ class CatalogController extends Controller
         $validated = $request->validate([
             'faculty_id' => ['required', 'integer', 'exists:faculties,id'],
             'name' => ['required', 'string', 'max:255'],
-            'year' => ['required', 'integer', 'between:1,6'],
+            'year' => ['required', 'integer', 'between:1,3'],
             'semester' => ['required', 'integer', 'between:1,2'],
             'description' => ['nullable', 'string', 'max:3000'],
             'professor_ids' => ['array'],

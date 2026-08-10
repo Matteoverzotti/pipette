@@ -103,7 +103,7 @@ export default function Catalog({ faculties, professors, courses }: Props) {
                     </select>
                     <input className="text-input" value={courseForm.data.name} onChange={(event) => courseForm.setData('name', event.target.value)} placeholder="Numele cursului" />
                     <select className="select-input" value={courseForm.data.year} onChange={(event) => courseForm.setData('year', event.target.value)}>
-                        {[1, 2, 3, 4, 5, 6].map((year) => <option key={year} value={year}>Anul {year}</option>)}
+                        {[1, 2, 3].map((year) => <option key={year} value={year}>Anul {year}</option>)}
                     </select>
                     <select className="select-input" value={courseForm.data.semester} onChange={(event) => courseForm.setData('semester', event.target.value)}>
                         <option value="1">Semestrul 1</option>

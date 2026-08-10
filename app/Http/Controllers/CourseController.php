@@ -15,7 +15,7 @@ class CourseController extends Controller
         $filters = $request->validate([
             'search' => ['nullable', 'string', 'max:100'],
             'faculty_id' => ['nullable', 'integer', 'exists:faculties,id'],
-            'year' => ['nullable', 'integer', 'between:1,6'],
+            'year' => ['nullable', 'integer', 'between:1,3'],
             'semester' => ['nullable', 'integer', 'between:1,2'],
         ]);
 

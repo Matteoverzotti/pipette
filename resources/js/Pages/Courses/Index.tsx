@@ -46,7 +46,7 @@ export default function CourseIndex({ courses, faculties, filters }: Props) {
                 </select>
                 <select className="select-input" value={filters.year ?? ''} onChange={(event) => updateFilter('year', event.target.value)}>
                     <option value="">Toți anii</option>
-                    {[1, 2, 3, 4, 5, 6].map((year) => <option key={year} value={year}>Anul {year}</option>)}
+                    {[1, 2, 3].map((year) => <option key={year} value={year}>Anul {year}</option>)}
                 </select>
                 <select className="select-input" value={filters.semester ?? ''} onChange={(event) => updateFilter('semester', event.target.value)}>
                     <option value="">Ambele semestre</option>
