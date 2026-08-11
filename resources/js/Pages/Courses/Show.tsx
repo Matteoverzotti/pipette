@@ -1,6 +1,6 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { Frown, Flag, GraduationCap, Lightbulb, Pencil, ShieldCheck, Smile, ThumbsDown, ThumbsUp, Trash2, UsersRound } from 'lucide-react';
-import { useState } from 'react';
+import { type SubmitEvent, useState } from 'react';
 import AppLayout from '../../Components/AppLayout';
 import FieldError from '../../Components/FieldError';
 import type { Course, FeedbackItem, SharedProps } from '../../types';
@@ -31,7 +31,7 @@ export default function CourseShow({ course, feedback, ownFeedback }: Props) {
     const [reportReason, setReportReason] = useState('irelevant');
     const [reportDetails, setReportDetails] = useState('');
 
-    function submitFeedback(event: React.FormEvent) {
+    function submitFeedback(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
         reviewForm.post('/feedback', { preserveScroll: true });
     }

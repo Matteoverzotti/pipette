@@ -1,6 +1,6 @@
 import { Head, router, useForm } from '@inertiajs/react';
 import { Check, Pencil, Plus, Save, Search, Trash2, X } from 'lucide-react';
-import { type FormEvent, useMemo, useRef, useState } from 'react';
+import { type SubmitEvent, useMemo, useRef, useState } from 'react';
 import AppLayout from '../../Components/AppLayout';
 import FieldError from '../../Components/FieldError';
 import type { Course, Faculty, Professor, StudyProgram } from '../../types';
@@ -127,7 +127,7 @@ export default function Catalog({ faculties, professors, studyPrograms, courses 
         window.requestAnimationFrame(() => courseFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
     }
 
-    function submitCourse(event: FormEvent) {
+    function submitCourse(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
 
         const options = { preserveScroll: true, onSuccess: resetCourseWorkspace };
@@ -200,7 +200,7 @@ export default function Catalog({ faculties, professors, studyPrograms, courses 
         courseForm.setData('new_professors', courseForm.data.new_professors.filter((professor) => professor.client_id !== clientId));
     }
 
-    function submitProfessorEdit(event: FormEvent) {
+    function submitProfessorEdit(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
 
         if (!professorEdit) {
@@ -214,7 +214,7 @@ export default function Catalog({ faculties, professors, studyPrograms, courses 
         );
     }
 
-    function submitStudyProgramEdit(event: FormEvent) {
+    function submitStudyProgramEdit(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
 
         if (!studyProgramEdit) {
