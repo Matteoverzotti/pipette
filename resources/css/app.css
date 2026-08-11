@@ -289,7 +289,7 @@
     }
 
     .admin-grid {
-        @apply grid gap-6 lg:grid-cols-2;
+        @apply grid gap-6 lg:grid-cols-2 xl:grid-cols-3;
     }
 
     .admin-heading {
@@ -413,7 +413,7 @@
     }
 
     table {
-        @apply w-full min-w-[720px] border-collapse text-left text-sm;
+        @apply w-full min-w-[860px] border-collapse text-left text-sm;
     }
 
     th {

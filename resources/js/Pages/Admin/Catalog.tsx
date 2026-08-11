@@ -3,11 +3,12 @@ import { Check, Pencil, Plus, Save, Search, Trash2, X } from 'lucide-react';
 import { type FormEvent, useMemo, useRef, useState } from 'react';
 import AppLayout from '../../Components/AppLayout';
 import FieldError from '../../Components/FieldError';
-import type { Course, Faculty, Professor } from '../../types';
+import type { Course, Faculty, Professor, StudyProgram } from '../../types';
 
 type Props = {
     faculties: Faculty[];
     professors: Professor[];
+    studyPrograms: StudyProgram[];
     courses: Course[];
 };
 
@@ -17,6 +18,7 @@ type CourseFormData = {
     year: string;
     semester: string;
     description: string;
+    study_program_ids: number[];
     professor_ids: number[];
     new_professors: NewProfessorDraft[];
 };
@@ -33,26 +35,35 @@ type ProfessorEdit = {
     title: string;
 };
 
+type StudyProgramEdit = {
+    id: number;
+    faculty_id: string;
+    name: string;
+};
+
 const blankCourseForm = (): CourseFormData => ({
     faculty_id: '',
     name: '',
     year: '1',
     semester: '1',
     description: '',
+    study_program_ids: [],
     professor_ids: [],
     new_professors: [],
 });
 
-export default function Catalog({ faculties, professors, courses }: Props) {
+export default function Catalog({ faculties, professors, studyPrograms, courses }: Props) {
     const courseFormRef = useRef<HTMLDivElement>(null);
     const [editingCourse, setEditingCourse] = useState<Course | null>(null);
     const [assignmentSearch, setAssignmentSearch] = useState('');
     const [draftProfessorName, setDraftProfessorName] = useState('');
     const [draftProfessorTitle, setDraftProfessorTitle] = useState('');
     const [professorEdit, setProfessorEdit] = useState<ProfessorEdit | null>(null);
+    const [studyProgramEdit, setStudyProgramEdit] = useState<StudyProgramEdit | null>(null);
 
     const facultyForm = useForm({ name: '' });
     const professorForm = useForm({ name: '', title: '' });
+    const studyProgramForm = useForm({ faculty_id: '', name: '' });
     const courseForm = useForm<CourseFormData>(blankCourseForm());
 
     const selectedProfessors = useMemo(
@@ -61,6 +72,22 @@ export default function Catalog({ faculties, professors, courses }: Props) {
             .filter(isProfessor),
         [courseForm.data.professor_ids, professors],
     );
+
+    const selectedStudyPrograms = useMemo(
+        () => courseForm.data.study_program_ids
+            .map((id) => studyPrograms.find((program) => program.id === id))
+            .filter(isStudyProgram),
+        [courseForm.data.study_program_ids, studyPrograms],
+    );
+
+    const studyProgramOptions = useMemo(() => {
+        const selectedIds = new Set(courseForm.data.study_program_ids);
+        const facultyId = Number(courseForm.data.faculty_id);
+
+        return studyPrograms
+            .filter((program) => !facultyId || program.faculty_id === facultyId)
+            .filter((program) => !selectedIds.has(program.id));
+    }, [courseForm.data.faculty_id, courseForm.data.study_program_ids, studyPrograms]);
 
     const professorOptions = useMemo(() => {
         const query = normalizeSearch(assignmentSearch);
@@ -93,6 +120,7 @@ export default function Catalog({ faculties, professors, courses }: Props) {
             year: String(course.year),
             semester: String(course.semester),
             description: course.description ?? '',
+            study_program_ids: course.study_programs?.map((program) => program.id) ?? [],
             professor_ids: course.professors?.map((professor) => professor.id) ?? [],
             new_professors: [],
         });
@@ -116,6 +144,30 @@ export default function Catalog({ faculties, professors, courses }: Props) {
             courseForm.setData('professor_ids', [...courseForm.data.professor_ids, professorId]);
         }
         setAssignmentSearch('');
+    }
+
+    function assignStudyProgram(studyProgramId: number) {
+        if (!courseForm.data.study_program_ids.includes(studyProgramId)) {
+            courseForm.setData('study_program_ids', [...courseForm.data.study_program_ids, studyProgramId]);
+        }
+    }
+
+    function removeStudyProgram(studyProgramId: number) {
+        courseForm.setData('study_program_ids', courseForm.data.study_program_ids.filter((id) => id !== studyProgramId));
+    }
+
+    function updateCourseFaculty(facultyId: string) {
+        const parsedFacultyId = Number(facultyId);
+
+        courseForm.setData({
+            ...courseForm.data,
+            faculty_id: facultyId,
+            study_program_ids: courseForm.data.study_program_ids.filter((id) => {
+                const program = studyPrograms.find((item) => item.id === id);
+
+                return program && program.faculty_id === parsedFacultyId;
+            }),
+        });
     }
 
     function removeProfessor(professorId: number) {
@@ -159,6 +211,20 @@ export default function Catalog({ faculties, professors, courses }: Props) {
             `/admin/professors/${professorEdit.id}`,
             { name: professorEdit.name, title: professorEdit.title },
             { preserveScroll: true, onSuccess: () => setProfessorEdit(null) },
+        );
+    }
+
+    function submitStudyProgramEdit(event: FormEvent) {
+        event.preventDefault();
+
+        if (!studyProgramEdit) {
+            return;
+        }
+
+        router.put(
+            `/admin/study-programs/${studyProgramEdit.id}`,
+            { faculty_id: studyProgramEdit.faculty_id, name: studyProgramEdit.name },
+            { preserveScroll: true, onSuccess: () => setStudyProgramEdit(null) },
         );
     }
 
@@ -254,6 +320,70 @@ export default function Catalog({ faculties, professors, courses }: Props) {
                         ))}
                     </ul>
                 </section>
+
+                <section className="panel">
+                    <h2 className="admin-heading">Domenii de licență</h2>
+                    <form
+                        className="stacked-form"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            studyProgramForm.post('/admin/study-programs', { preserveScroll: true, onSuccess: () => studyProgramForm.reset() });
+                        }}
+                    >
+                        <label className="field-label">Facultate</label>
+                        <select className="select-input" value={studyProgramForm.data.faculty_id} onChange={(event) => studyProgramForm.setData('faculty_id', event.target.value)}>
+                            <option value="">Alege facultatea</option>
+                            {faculties.map((faculty) => <option key={faculty.id} value={faculty.id}>{faculty.name}</option>)}
+                        </select>
+                        <FieldError message={studyProgramForm.errors.faculty_id} />
+                        <label className="field-label">Nume</label>
+                        <input className="text-input" value={studyProgramForm.data.name} onChange={(event) => studyProgramForm.setData('name', event.target.value)} placeholder="Informatică" />
+                        <FieldError message={studyProgramForm.errors.name} />
+                        <button className="primary-button" type="submit"><Plus size={17} /> Adaugă</button>
+                    </form>
+                    <ul className="admin-list admin-list-scroll">
+                        {studyPrograms.map((program) => (
+                            <li key={program.id}>
+                                {studyProgramEdit?.id === program.id ? (
+                                    <form className="inline-edit-form" onSubmit={submitStudyProgramEdit}>
+                                        <select
+                                            className="select-input"
+                                            value={studyProgramEdit.faculty_id}
+                                            onChange={(event) => setStudyProgramEdit({ ...studyProgramEdit, faculty_id: event.target.value })}
+                                        >
+                                            {faculties.map((faculty) => <option key={faculty.id} value={faculty.id}>{faculty.name}</option>)}
+                                        </select>
+                                        <input
+                                            className="text-input"
+                                            value={studyProgramEdit.name}
+                                            onChange={(event) => setStudyProgramEdit({ ...studyProgramEdit, name: event.target.value })}
+                                        />
+                                        <span className="row-actions">
+                                            <button className="icon-button selected" title="Salvează" type="submit">
+                                                <Check size={16} />
+                                            </button>
+                                            <button className="icon-button" title="Anulează" type="button" onClick={() => setStudyProgramEdit(null)}>
+                                                <X size={16} />
+                                            </button>
+                                        </span>
+                                    </form>
+                                ) : (
+                                    <>
+                                        <span>{program.name} <small>{program.faculty?.name} · {program.courses_count ?? 0} cursuri</small></span>
+                                        <span className="row-actions">
+                                            <button className="icon-button" title="Editează" type="button" onClick={() => setStudyProgramEdit({ id: program.id, faculty_id: String(program.faculty_id), name: program.name })}>
+                                                <Pencil size={16} />
+                                            </button>
+                                            <button className="icon-button danger" title="Șterge" type="button" onClick={() => deleteStudyProgram(program)}>
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </span>
+                                    </>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                </section>
             </section>
 
             <section className="panel mt-6" ref={courseFormRef}>
@@ -272,7 +402,7 @@ export default function Catalog({ faculties, professors, courses }: Props) {
                     <div className="catalog-fields">
                         <div>
                             <label className="field-label">Facultate</label>
-                            <select className="select-input" value={courseForm.data.faculty_id} onChange={(event) => courseForm.setData('faculty_id', event.target.value)}>
+                            <select className="select-input" value={courseForm.data.faculty_id} onChange={(event) => updateCourseFaculty(event.target.value)}>
                                 <option value="">Alege facultatea</option>
                                 {faculties.map((faculty) => <option key={faculty.id} value={faculty.id}>{faculty.name}</option>)}
                             </select>
@@ -302,6 +432,26 @@ export default function Catalog({ faculties, professors, courses }: Props) {
                             <label className="field-label">Descriere</label>
                             <textarea className="text-area" value={courseForm.data.description} onChange={(event) => courseForm.setData('description', event.target.value)} placeholder="Descriere opțională" />
                             <FieldError message={courseForm.errors.description} />
+                        </div>
+                        <div className="md:col-span-2">
+                            <label className="field-label">Domenii de licență</label>
+                            <div className="selected-professors">
+                                {selectedStudyPrograms.map((program) => (
+                                    <button className="professor-chip" key={program.id} type="button" onClick={() => removeStudyProgram(program.id)}>
+                                        {program.name}
+                                        <X size={14} />
+                                    </button>
+                                ))}
+                                {selectedStudyPrograms.length === 0 && (
+                                    <span className="empty-chip">Alege cel puțin un domeniu</span>
+                                )}
+                            </div>
+                            <select className="select-input" value="" onChange={(event) => event.target.value && assignStudyProgram(Number(event.target.value))}>
+                                <option value="">{courseForm.data.faculty_id ? 'Adaugă domeniu' : 'Alege întâi facultatea'}</option>
+                                {studyProgramOptions.map((program) => <option key={program.id} value={program.id}>{program.name}</option>)}
+                            </select>
+                            <FieldError message={courseForm.errors.study_program_ids} />
+                            <FieldError message={(courseForm.errors as Record<string, string>)['study_program_ids.0']} />
                         </div>
                     </div>
 
@@ -378,6 +528,7 @@ export default function Catalog({ faculties, professors, courses }: Props) {
                             <tr>
                                 <th>Curs</th>
                                 <th>Facultate</th>
+                                <th>Domenii</th>
                                 <th>An/Semestru</th>
                                 <th>Profesori</th>
                                 <th />
@@ -388,6 +539,7 @@ export default function Catalog({ faculties, professors, courses }: Props) {
                                 <tr key={course.id}>
                                     <td>{course.name}</td>
                                     <td>{course.faculty?.name}</td>
+                                    <td>{course.study_programs?.map((program) => program.name).join(', ') || '-'}</td>
                                     <td>{course.year}/{course.semester}</td>
                                     <td>{course.professors?.map(professorLabel).join(', ') || '-'}</td>
                                     <td className="table-actions">
@@ -408,6 +560,10 @@ export default function Catalog({ faculties, professors, courses }: Props) {
 
 function isProfessor(professor: Professor | undefined): professor is Professor {
     return professor !== undefined;
+}
+
+function isStudyProgram(program: StudyProgram | undefined): program is StudyProgram {
+    return program !== undefined;
 }
 
 function normalizeSearch(value: string) {
@@ -444,6 +600,17 @@ function deleteProfessor(professor: Professor) {
 
     if (window.confirm(`Ștergi profesorul "${professor.name}"?\n\n${warning}`)) {
         router.delete(`/admin/professors/${professor.id}`, { preserveScroll: true });
+    }
+}
+
+function deleteStudyProgram(program: StudyProgram) {
+    const courseCount = program.courses_count ?? 0;
+    const warning = courseCount > 0
+        ? `Domeniul va fi scos din ${courseCount} cursuri. Feedbackul cursurilor rămâne păstrat.`
+        : 'Această acțiune nu poate fi anulată din interfață.';
+
+    if (window.confirm(`Ștergi domeniul "${program.name}"?\n\n${warning}`)) {
+        router.delete(`/admin/study-programs/${program.id}`, { preserveScroll: true });
     }
 }
 

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Course;
 use App\Models\Faculty;
+use App\Models\StudyProgram;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -85,6 +86,52 @@ class CourseIndexTest extends TestCase
                 ->where('filters.faculty_id', (string) $fmi->id)
                 ->where('filters.year', '3')
                 ->where('filters.semester', '1')
+                ->etc()
+            );
+    }
+
+    public function test_study_program_filter_constrains_courses(): void
+    {
+        $user = User::factory()->create(['email' => 'student@s.unibuc.ro']);
+        $faculty = Faculty::create(['name' => 'FMI', 'slug' => 'fmi']);
+        $informatics = StudyProgram::create([
+            'faculty_id' => $faculty->id,
+            'name' => 'Informatică',
+            'slug' => 'informatica',
+        ]);
+        $mathematics = StudyProgram::create([
+            'faculty_id' => $faculty->id,
+            'name' => 'Matematică',
+            'slug' => 'matematica',
+        ]);
+
+        $distributed = Course::create([
+            'faculty_id' => $faculty->id,
+            'name' => 'Sisteme distribuite',
+            'slug' => 'sisteme-distribuite',
+            'year' => 3,
+            'semester' => 1,
+        ]);
+        $distributed->studyPrograms()->sync([$informatics->id]);
+
+        $analysis = Course::create([
+            'faculty_id' => $faculty->id,
+            'name' => 'Analiză matematică',
+            'slug' => 'analiza-matematica',
+            'year' => 1,
+            'semester' => 1,
+        ]);
+        $analysis->studyPrograms()->sync([$mathematics->id]);
+
+        $this->actingAs($user)
+            ->get("/courses?study_program_id={$informatics->id}")
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Courses/Index')
+                ->has('courses', 1)
+                ->where('courses.0.name', 'Sisteme distribuite')
+                ->where('courses.0.study_programs.0.name', 'Informatică')
+                ->where('filters.study_program_id', (string) $informatics->id)
                 ->etc()
             );
     }

@@ -23,6 +23,14 @@ export type Faculty = {
     courses_count?: number;
 };
 
+export type StudyProgram = {
+    id: number;
+    faculty_id: number;
+    name: string;
+    faculty?: Faculty;
+    courses_count?: number;
+};
+
 export type Professor = {
     id: number;
     name: string;
@@ -38,6 +46,7 @@ export type Course = {
     semester: number;
     description?: string | null;
     faculty?: Faculty;
+    study_programs?: StudyProgram[];
     professors?: Professor[];
     feedback_count?: number;
 };

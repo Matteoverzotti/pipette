@@ -28,6 +28,11 @@ class Course extends Model
         return $this->belongsToMany(Professor::class)->withTimestamps();
     }
 
+    public function studyPrograms(): BelongsToMany
+    {
+        return $this->belongsToMany(StudyProgram::class)->withTimestamps();
+    }
+
     public function feedback(): HasMany
     {
         return $this->hasMany(Feedback::class);

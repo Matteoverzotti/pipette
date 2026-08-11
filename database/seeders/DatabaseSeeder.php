@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Faculty;
 use App\Models\Feedback;
 use App\Models\Professor;
+use App\Models\StudyProgram;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -40,6 +41,21 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Facultatea de Filosofie'],
         );
 
+        $informatica = StudyProgram::firstOrCreate(
+            ['slug' => 'informatica'],
+            ['faculty_id' => $fmi->id, 'name' => 'Informatică'],
+        );
+
+        $cti = StudyProgram::firstOrCreate(
+            ['slug' => 'cti'],
+            ['faculty_id' => $fmi->id, 'name' => 'Calculatoare și Tehnologia Informației'],
+        );
+
+        $filosofieProgram = StudyProgram::firstOrCreate(
+            ['slug' => 'filosofie-program'],
+            ['faculty_id' => $filosofie->id, 'name' => 'Filosofie'],
+        );
+
         $professors = collect([
             ['name' => 'Ioana Popescu', 'title' => 'conf. univ. dr.'],
             ['name' => 'Andrei Ionescu', 'title' => 'lect. univ. dr.'],
@@ -69,7 +85,9 @@ class DatabaseSeeder extends Seeder
         );
 
         $distributed->professors()->sync([$professors[0]->id, $professors[1]->id]);
+        $distributed->studyPrograms()->sync([$informatica->id, $cti->id]);
         $ethics->professors()->sync([$professors[2]->id]);
+        $ethics->studyPrograms()->sync([$filosofieProgram->id]);
 
         Feedback::firstOrCreate([
             'course_id' => $distributed->id,

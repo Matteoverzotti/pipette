@@ -8,8 +8,8 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\VoteController;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::redirect('/', '/courses');
 
@@ -44,6 +44,9 @@ Route::middleware('auth')->group(function (): void {
         Route::post('/professors', [CatalogController::class, 'storeProfessor'])->name('professors.store');
         Route::put('/professors/{professor}', [CatalogController::class, 'updateProfessor'])->name('professors.update');
         Route::delete('/professors/{professor}', [CatalogController::class, 'destroyProfessor'])->name('professors.destroy');
+        Route::post('/study-programs', [CatalogController::class, 'storeStudyProgram'])->name('study-programs.store');
+        Route::put('/study-programs/{studyProgram}', [CatalogController::class, 'updateStudyProgram'])->name('study-programs.update');
+        Route::delete('/study-programs/{studyProgram}', [CatalogController::class, 'destroyStudyProgram'])->name('study-programs.destroy');
         Route::post('/courses', [CatalogController::class, 'storeCourse'])->name('courses.store');
         Route::put('/courses/{course}', [CatalogController::class, 'updateCourse'])->name('courses.update');
         Route::delete('/courses/{course}', [CatalogController::class, 'destroyCourse'])->name('courses.destroy');

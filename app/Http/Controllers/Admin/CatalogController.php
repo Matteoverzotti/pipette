@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Faculty;
 use App\Models\Professor;
+use App\Models\StudyProgram;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -20,7 +21,11 @@ class CatalogController extends Controller
         return Inertia::render('Admin/Catalog', [
             'faculties' => Faculty::withCount('courses')->orderBy('name')->get(),
             'professors' => Professor::withCount('courses')->orderBy('name')->get(),
-            'courses' => Course::with(['faculty:id,name', 'professors:id,name,title'])
+            'studyPrograms' => StudyProgram::with(['faculty:id,name'])
+                ->withCount('courses')
+                ->orderBy('name')
+                ->get(),
+            'courses' => Course::with(['faculty:id,name', 'professors:id,name,title', 'studyPrograms:id,faculty_id,name'])
                 ->orderBy('name')
                 ->get(),
         ]);
@@ -92,6 +97,57 @@ class CatalogController extends Controller
         return back()->with('success', 'Profesorul a fost șters.');
     }
 
+    public function storeStudyProgram(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'faculty_id' => ['required', 'integer', 'exists:faculties,id'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('study_programs', 'name')->where('faculty_id', $request->integer('faculty_id')),
+            ],
+        ]);
+
+        StudyProgram::create([
+            'faculty_id' => $validated['faculty_id'],
+            'name' => $validated['name'],
+            'slug' => Str::slug($validated['name']).'-'.Str::lower(Str::random(6)),
+        ]);
+
+        return back()->with('success', 'Domeniul de licență a fost adăugat.');
+    }
+
+    public function updateStudyProgram(Request $request, StudyProgram $studyProgram): RedirectResponse
+    {
+        $validated = $request->validate([
+            'faculty_id' => ['required', 'integer', 'exists:faculties,id'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('study_programs', 'name')
+                    ->where('faculty_id', $request->integer('faculty_id'))
+                    ->ignore($studyProgram),
+            ],
+        ]);
+
+        $studyProgram->update([
+            'faculty_id' => $validated['faculty_id'],
+            'name' => $validated['name'],
+            'slug' => Str::slug($validated['name']).'-'.$studyProgram->id,
+        ]);
+
+        return back()->with('success', 'Domeniul de licență a fost actualizat.');
+    }
+
+    public function destroyStudyProgram(StudyProgram $studyProgram): RedirectResponse
+    {
+        $studyProgram->delete();
+
+        return back()->with('success', 'Domeniul de licență a fost șters.');
+    }
+
     public function storeCourse(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -100,6 +156,11 @@ class CatalogController extends Controller
             'year' => ['required', 'integer', 'between:1,3'],
             'semester' => ['required', 'integer', 'between:1,2'],
             'description' => ['nullable', 'string', 'max:3000'],
+            'study_program_ids' => ['required', 'array', 'min:1'],
+            'study_program_ids.*' => [
+                'integer',
+                Rule::exists('study_programs', 'id')->where('faculty_id', $request->integer('faculty_id')),
+            ],
             'professor_ids' => ['array'],
             'professor_ids.*' => ['integer', 'exists:professors,id'],
             'new_professors' => ['array'],
@@ -117,6 +178,7 @@ class CatalogController extends Controller
         ]);
 
         $course->professors()->sync($this->professorIdsForCourse($validated));
+        $course->studyPrograms()->sync($this->studyProgramIdsForCourse($validated));
 
         return back()->with('success', 'Cursul a fost adăugat.');
     }
@@ -129,6 +191,11 @@ class CatalogController extends Controller
             'year' => ['required', 'integer', 'between:1,3'],
             'semester' => ['required', 'integer', 'between:1,2'],
             'description' => ['nullable', 'string', 'max:3000'],
+            'study_program_ids' => ['required', 'array', 'min:1'],
+            'study_program_ids.*' => [
+                'integer',
+                Rule::exists('study_programs', 'id')->where('faculty_id', $request->integer('faculty_id')),
+            ],
             'professor_ids' => ['array'],
             'professor_ids.*' => ['integer', 'exists:professors,id'],
             'new_professors' => ['array'],
@@ -146,6 +213,7 @@ class CatalogController extends Controller
         ]);
 
         $course->professors()->sync($this->professorIdsForCourse($validated));
+        $course->studyPrograms()->sync($this->studyProgramIdsForCourse($validated));
 
         return back()->with('success', 'Cursul a fost actualizat.');
     }
@@ -186,6 +254,19 @@ class CatalogController extends Controller
         }
 
         return $professorIds
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  array<string, mixed>  $validated
+     * @return array<int, int>
+     */
+    private function studyProgramIdsForCourse(array $validated): array
+    {
+        return collect($validated['study_program_ids'] ?? [])
             ->map(fn ($id) => (int) $id)
             ->unique()
             ->values()

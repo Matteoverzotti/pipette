@@ -1,14 +1,16 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { BookOpen, Search, UsersRound } from 'lucide-react';
+import { BookOpen, GraduationCap, Search, UsersRound } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import AppLayout from '../../Components/AppLayout';
-import type { Course, Faculty } from '../../types';
+import type { Course, Faculty, StudyProgram } from '../../types';
 
 type Props = {
     courses: Course[];
     faculties: Faculty[];
+    studyPrograms: StudyProgram[];
     filters: {
         faculty_id?: number | string;
+        study_program_id?: number | string;
         year?: number | string;
         semester?: number | string;
     };
@@ -16,7 +18,7 @@ type Props = {
 
 const coursesPerPage = 12;
 
-export default function CourseIndex({ courses, faculties, filters }: Props) {
+export default function CourseIndex({ courses, faculties, studyPrograms, filters }: Props) {
     const [search, setSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -30,6 +32,12 @@ export default function CourseIndex({ courses, faculties, filters }: Props) {
         return courses.filter((course) => normalizeSearch(course.name).includes(query));
     }, [courses, search]);
 
+    const availableStudyPrograms = useMemo(() => {
+        const facultyId = Number(filters.faculty_id);
+
+        return studyPrograms.filter((program) => !facultyId || program.faculty_id === facultyId);
+    }, [filters.faculty_id, studyPrograms]);
+
     const pageCount = Math.max(1, Math.ceil(filteredCourses.length / coursesPerPage));
     const safeCurrentPage = Math.min(currentPage, pageCount);
     const visibleCourses = filteredCourses.slice((safeCurrentPage - 1) * coursesPerPage, safeCurrentPage * coursesPerPage);
@@ -42,7 +50,18 @@ export default function CourseIndex({ courses, faculties, filters }: Props) {
 
     function updateFilter(name: string, value: string) {
         setCurrentPage(1);
-        router.get('/courses', { ...filters, [name]: value || undefined }, { preserveState: true, replace: true });
+        const nextFilters = { ...filters, [name]: value || undefined };
+
+        if (name === 'faculty_id' && value) {
+            const facultyId = Number(value);
+            const selectedProgram = studyPrograms.find((program) => String(program.id) === String(filters.study_program_id));
+
+            if (!selectedProgram || selectedProgram.faculty_id !== facultyId) {
+                nextFilters.study_program_id = undefined;
+            }
+        }
+
+        router.get('/courses', nextFilters, { preserveState: true, replace: true });
     }
 
     function updateSearch(value: string) {
@@ -66,6 +85,10 @@ export default function CourseIndex({ courses, faculties, filters }: Props) {
                 <select className="select-input" value={filters.faculty_id ?? ''} onChange={(event) => updateFilter('faculty_id', event.target.value)}>
                     <option value="">Toate facultățile</option>
                     {faculties.map((faculty) => <option key={faculty.id} value={faculty.id}>{faculty.name}</option>)}
+                </select>
+                <select className="select-input" value={filters.study_program_id ?? ''} onChange={(event) => updateFilter('study_program_id', event.target.value)}>
+                    <option value="">Toate domeniile</option>
+                    {availableStudyPrograms.map((program) => <option key={program.id} value={program.id}>{program.name}</option>)}
                 </select>
                 <select className="select-input" value={filters.year ?? ''} onChange={(event) => updateFilter('year', event.target.value)}>
                     <option value="">Toți anii</option>
@@ -99,6 +122,10 @@ export default function CourseIndex({ courses, faculties, filters }: Props) {
                             <div className="mt-4 flex items-center gap-2 text-sm text-slate-700">
                                 <UsersRound size={16} />
                                 <span>{course.professors?.map((professor) => professor.name).join(', ') || 'Profesori neasignați'}</span>
+                            </div>
+                            <div className="mt-2 flex items-center gap-2 text-sm text-slate-700">
+                                <GraduationCap size={16} />
+                                <span>{course.study_programs?.map((program) => program.name).join(', ') || 'Domeniu neasignat'}</span>
                             </div>
                         </Link>
                     ))}

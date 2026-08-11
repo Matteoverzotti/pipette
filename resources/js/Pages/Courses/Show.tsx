@@ -1,5 +1,5 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { Frown, Flag, Lightbulb, Pencil, ShieldCheck, Smile, ThumbsDown, ThumbsUp, Trash2, UsersRound } from 'lucide-react';
+import { Frown, Flag, GraduationCap, Lightbulb, Pencil, ShieldCheck, Smile, ThumbsDown, ThumbsUp, Trash2, UsersRound } from 'lucide-react';
 import { useState } from 'react';
 import AppLayout from '../../Components/AppLayout';
 import FieldError from '../../Components/FieldError';
@@ -52,6 +52,17 @@ export default function CourseShow({ course, feedback, ownFeedback }: Props) {
                             <UsersRound size={14} /> {professor.title ? `${professor.title} ` : ''}{professor.name}
                         </span>
                     )) : <span className="badge neutral">Profesori neasignați</span>}
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                    {course.study_programs?.length ? course.study_programs.map((program) => (
+                        <span className="badge neutral" key={program.id}>
+                            <GraduationCap size={14} /> {program.name}
+                        </span>
+                    )) : (
+                        <span className="badge neutral">
+                            <GraduationCap size={14} /> Domeniu neasignat
+                        </span>
+                    )}
                 </div>
             </section>
 
